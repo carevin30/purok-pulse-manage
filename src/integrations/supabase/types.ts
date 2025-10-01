@@ -17,6 +17,8 @@ export type Database = {
       households: {
         Row: {
           created_at: string
+          has_electricity: boolean | null
+          has_water: boolean | null
           head_of_household_id: string | null
           house_number: string
           id: string
@@ -26,6 +28,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          has_electricity?: boolean | null
+          has_water?: boolean | null
           head_of_household_id?: string | null
           house_number: string
           id?: string
@@ -35,6 +39,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          has_electricity?: boolean | null
+          has_water?: boolean | null
           head_of_household_id?: string | null
           house_number?: string
           id?: string

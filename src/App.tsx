@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Residents from "./pages/Residents";
+import Households from "./pages/Households";
 import Activities from "./pages/Activities";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
@@ -24,7 +25,7 @@ const App = () => (
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="residents" element={<Residents />} />
-            <Route path="households" element={<Placeholder />} />
+            <Route path="households" element={<Households />} />
             <Route path="officials" element={<Placeholder />} />
             <Route path="ordinances" element={<Placeholder />} />
             <Route path="activities" element={<Activities />} />
