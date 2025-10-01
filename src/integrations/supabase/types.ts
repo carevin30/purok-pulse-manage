@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      households: {
+        Row: {
+          created_at: string
+          head_of_household_id: string | null
+          house_number: string
+          id: string
+          purok: string | null
+          street_address: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          head_of_household_id?: string | null
+          house_number: string
+          id?: string
+          purok?: string | null
+          street_address?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          head_of_household_id?: string | null
+          house_number?: string
+          id?: string
+          purok?: string | null
+          street_address?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_head_of_household"
+            columns: ["head_of_household_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       residents: {
         Row: {
           barangay_id_number: string | null
@@ -22,6 +60,7 @@ export type Database = {
           email: string | null
           first_name: string
           gender: string
+          house_number: string | null
           household_id: string | null
           id: string
           is_indigenous: boolean | null
@@ -42,6 +81,7 @@ export type Database = {
           email?: string | null
           first_name: string
           gender: string
+          house_number?: string | null
           household_id?: string | null
           id?: string
           is_indigenous?: boolean | null
@@ -62,6 +102,7 @@ export type Database = {
           email?: string | null
           first_name?: string
           gender?: string
+          house_number?: string | null
           household_id?: string | null
           id?: string
           is_indigenous?: boolean | null
