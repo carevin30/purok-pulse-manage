@@ -4,9 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Search, Users, Zap, Droplet } from "lucide-react";
+import { Plus, Search, Users, Zap, Droplet, Pencil, Trash2 } from "lucide-react";
 import AddHouseholdDialog from "@/components/AddHouseholdDialog";
+import EditHouseholdDialog from "@/components/EditHouseholdDialog";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -40,6 +51,8 @@ export default function Households() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingHousehold, setEditingHousehold] = useState<Household | null>(null);
+  const [deletingHousehold, setDeletingHousehold] = useState<Household | null>(null);
   const { toast } = useToast();
 
   const fetchHouseholds = async () => {
@@ -98,6 +111,44 @@ export default function Households() {
     (household.purok && household.purok.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  const handleDelete = async () => {
+    if (!deletingHousehold) return;
+
+    try {
+      // First, remove household association from residents
+      const { error: updateError } = await supabase
+        .from("residents")
+        .update({ household_id: null, house_number: null })
+        .eq("household_id", deletingHousehold.id);
+
+      if (updateError) throw updateError;
+
+      // Then delete the household
+      const { error: deleteError } = await supabase
+        .from("households")
+        .delete()
+        .eq("id", deletingHousehold.id);
+
+      if (deleteError) throw deleteError;
+
+      toast({
+        title: "Success",
+        description: "Household deleted successfully",
+      });
+
+      fetchHouseholds();
+    } catch (error) {
+      console.error("Error deleting household:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete household",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingHousehold(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -150,6 +201,7 @@ export default function Households() {
                     <TableHead>Address</TableHead>
                     <TableHead>Residents</TableHead>
                     <TableHead>Utilities</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -185,6 +237,24 @@ export default function Households() {
                           )}
                         </div>
                       </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setEditingHousehold(household)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeletingHousehold(household)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -193,6 +263,33 @@ export default function Households() {
           )}
         </CardContent>
       </Card>
+
+      {editingHousehold && (
+        <EditHouseholdDialog
+          household={editingHousehold}
+          open={!!editingHousehold}
+          onOpenChange={(open) => !open && setEditingHousehold(null)}
+          onSuccess={fetchHouseholds}
+        />
+      )}
+
+      <AlertDialog open={!!deletingHousehold} onOpenChange={(open) => !open && setDeletingHousehold(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete household {deletingHousehold?.house_number} from the system.
+              All residents will be unassigned from this household. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

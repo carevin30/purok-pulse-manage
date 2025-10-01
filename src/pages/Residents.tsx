@@ -3,10 +3,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, FileText } from "lucide-react";
+import { Search, FileText, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AddResidentDialog from "@/components/AddResidentDialog";
+import EditResidentDialog from "@/components/EditResidentDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Resident {
   id: string;
@@ -26,6 +37,8 @@ export default function Residents() {
   const [residents, setResidents] = useState<Resident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [editingResident, setEditingResident] = useState<Resident | null>(null);
+  const [deletingResident, setDeletingResident] = useState<Resident | null>(null);
   const { toast } = useToast();
 
   const fetchResidents = async () => {
@@ -77,6 +90,34 @@ export default function Residents() {
     return fullName.includes(searchQuery.toLowerCase()) || 
            resident.house_number?.toLowerCase().includes(searchQuery.toLowerCase());
   });
+
+  const handleDelete = async () => {
+    if (!deletingResident) return;
+
+    try {
+      const { error } = await supabase
+        .from("residents")
+        .delete()
+        .eq("id", deletingResident.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Resident deleted successfully",
+      });
+
+      fetchResidents();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete resident",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingResident(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -154,7 +195,22 @@ export default function Residents() {
                           )}
                         </td>
                         <td className="py-4 text-right">
-                          <Button variant="ghost" size="sm">View</Button>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingResident(resident)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeletingResident(resident)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -165,6 +221,33 @@ export default function Residents() {
           )}
         </CardContent>
       </Card>
+
+      {editingResident && (
+        <EditResidentDialog
+          resident={editingResident}
+          open={!!editingResident}
+          onOpenChange={(open) => !open && setEditingResident(null)}
+          onSuccess={fetchResidents}
+        />
+      )}
+
+      <AlertDialog open={!!deletingResident} onOpenChange={(open) => !open && setDeletingResident(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete {deletingResident?.first_name} {deletingResident?.last_name} from the system.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
