@@ -23,7 +23,6 @@ const residentSchema = z.object({
   street_address: z.string().optional(),
   phone_number: z.string().max(20).optional(),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
-  barangay_id_number: z.string().max(50).optional(),
   is_senior_citizen: z.boolean().default(false),
   is_pwd: z.boolean().default(false),
   is_indigenous: z.boolean().default(false),
@@ -53,7 +52,6 @@ export default function AddResidentDialog({ onSuccess }: AddResidentDialogProps)
       street_address: "",
       phone_number: "",
       email: "",
-      barangay_id_number: "",
       is_senior_citizen: false,
       is_pwd: false,
       is_indigenous: false,
@@ -74,7 +72,6 @@ export default function AddResidentDialog({ onSuccess }: AddResidentDialogProps)
         street_address: data.street_address || null,
         phone_number: data.phone_number || null,
         email: data.email || null,
-        barangay_id_number: data.barangay_id_number || null,
         is_senior_citizen: data.is_senior_citizen,
         is_pwd: data.is_pwd,
         is_indigenous: data.is_indigenous,
@@ -247,23 +244,10 @@ export default function AddResidentDialog({ onSuccess }: AddResidentDialogProps)
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="col-span-2">
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="barangay_id_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Barangay ID Number</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

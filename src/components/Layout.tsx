@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -8,8 +9,12 @@ import {
   FileText, 
   Calendar,
   ClipboardList,
-  Settings
+  Settings,
+  LogOut
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -22,8 +27,45 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    // Check authentication
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate("/auth");
+      } else {
+        setUserEmail(session.user.email || "");
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate("/auth");
+      } else {
+        setUserEmail(session.user.email || "");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      navigate("/auth");
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -70,14 +112,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </h2>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-foreground">Barangay Hall</p>
+                <p className="text-sm font-medium text-foreground">{userEmail}</p>
                 <p className="text-xs text-muted-foreground">Admin User</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-accent to-accent/80" />
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
-        <div className="p-8">{children}</div>
+        <div className="p-8"><Outlet /></div>
       </main>
     </div>
   );

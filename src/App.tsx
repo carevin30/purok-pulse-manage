@@ -9,6 +9,7 @@ import Residents from "./pages/Residents";
 import Activities from "./pages/Activities";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -19,14 +20,17 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/residents" element={<Layout><Residents /></Layout>} />
-          <Route path="/households" element={<Layout><Placeholder /></Layout>} />
-          <Route path="/officials" element={<Layout><Placeholder /></Layout>} />
-          <Route path="/ordinances" element={<Layout><Placeholder /></Layout>} />
-          <Route path="/activities" element={<Layout><Activities /></Layout>} />
-          <Route path="/reports" element={<Layout><Placeholder /></Layout>} />
-          <Route path="/settings" element={<Layout><Placeholder /></Layout>} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="residents" element={<Residents />} />
+            <Route path="households" element={<Placeholder />} />
+            <Route path="officials" element={<Placeholder />} />
+            <Route path="ordinances" element={<Placeholder />} />
+            <Route path="activities" element={<Activities />} />
+            <Route path="reports" element={<Placeholder />} />
+            <Route path="settings" element={<Placeholder />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
