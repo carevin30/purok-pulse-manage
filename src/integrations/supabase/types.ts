@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      residents: {
+        Row: {
+          barangay_id_number: string | null
+          created_at: string
+          date_of_birth: string
+          email: string | null
+          first_name: string
+          gender: string
+          household_id: string | null
+          id: string
+          is_indigenous: boolean | null
+          is_pwd: boolean | null
+          is_senior_citizen: boolean | null
+          last_name: string
+          middle_name: string | null
+          phone_number: string | null
+          purok: string | null
+          status: string | null
+          street_address: string | null
+          updated_at: string
+        }
+        Insert: {
+          barangay_id_number?: string | null
+          created_at?: string
+          date_of_birth: string
+          email?: string | null
+          first_name: string
+          gender: string
+          household_id?: string | null
+          id?: string
+          is_indigenous?: boolean | null
+          is_pwd?: boolean | null
+          is_senior_citizen?: boolean | null
+          last_name: string
+          middle_name?: string | null
+          phone_number?: string | null
+          purok?: string | null
+          status?: string | null
+          street_address?: string | null
+          updated_at?: string
+        }
+        Update: {
+          barangay_id_number?: string | null
+          created_at?: string
+          date_of_birth?: string
+          email?: string | null
+          first_name?: string
+          gender?: string
+          household_id?: string | null
+          id?: string
+          is_indigenous?: boolean | null
+          is_pwd?: boolean | null
+          is_senior_citizen?: boolean | null
+          last_name?: string
+          middle_name?: string | null
+          phone_number?: string | null
+          purok?: string | null
+          status?: string | null
+          street_address?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
