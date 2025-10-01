@@ -54,7 +54,6 @@ export type Database = {
       }
       residents: {
         Row: {
-          barangay_id_number: string | null
           created_at: string
           date_of_birth: string
           email: string | null
@@ -75,7 +74,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          barangay_id_number?: string | null
           created_at?: string
           date_of_birth: string
           email?: string | null
@@ -96,7 +94,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          barangay_id_number?: string | null
           created_at?: string
           date_of_birth?: string
           email?: string | null
