@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Residents from "./pages/Residents";
 import Households from "./pages/Households";
+import Officials from "./pages/Officials";
 import Activities from "./pages/Activities";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
@@ -34,7 +35,7 @@ const App: React.FC = () => {
               <Route index element={<Dashboard />} />
               <Route path="residents" element={<Residents />} />
               <Route path="households" element={<Households />} />
-              <Route path="officials" element={<Placeholder />} />
+              <Route path="officials" element={<Officials />} />
               <Route path="ordinances" element={<Placeholder />} />
               <Route path="activities" element={<Activities />} />
               <Route path="reports" element={<Placeholder />} />

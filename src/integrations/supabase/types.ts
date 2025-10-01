@@ -58,6 +58,47 @@ export type Database = {
           },
         ]
       }
+      officials: {
+        Row: {
+          created_at: string
+          id: string
+          position: string
+          resident_id: string
+          status: string
+          term_end: string | null
+          term_start: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          position: string
+          resident_id: string
+          status?: string
+          term_end?: string | null
+          term_start: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          position?: string
+          resident_id?: string
+          status?: string
+          term_end?: string | null
+          term_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "officials_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       residents: {
         Row: {
           created_at: string
