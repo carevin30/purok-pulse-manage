@@ -177,6 +177,48 @@ export type Database = {
         }
         Relationships: []
       }
+      reports: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          priority: string
+          report_type: string
+          reported_by: string | null
+          reported_date: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          priority?: string
+          report_type: string
+          reported_by?: string | null
+          reported_date?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          priority?: string
+          report_type?: string
+          reported_by?: string | null
+          reported_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       residents: {
         Row: {
           created_at: string

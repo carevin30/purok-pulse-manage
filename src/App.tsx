@@ -11,6 +11,7 @@ import Households from "./pages/Households";
 import Officials from "./pages/Officials";
 import Activities from "./pages/Activities";
 import Ordinances from "./pages/Ordinances";
+import Reports from "./pages/Reports";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -39,7 +40,7 @@ const App: React.FC = () => {
               <Route path="officials" element={<Officials />} />
               <Route path="ordinances" element={<Ordinances />} />
               <Route path="activities" element={<Activities />} />
-              <Route path="reports" element={<Placeholder />} />
+              <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Placeholder />} />
             </Route>
             <Route path="*" element={<NotFound />} />
