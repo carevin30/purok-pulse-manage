@@ -99,6 +99,42 @@ export type Database = {
           },
         ]
       }
+      ordinances: {
+        Row: {
+          content: string | null
+          created_at: string
+          date_enacted: string
+          description: string | null
+          id: string
+          ordinance_number: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          date_enacted: string
+          description?: string | null
+          id?: string
+          ordinance_number: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          date_enacted?: string
+          description?: string | null
+          id?: string
+          ordinance_number?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       residents: {
         Row: {
           created_at: string
