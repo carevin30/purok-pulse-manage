@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          activity_date: string
+          activity_type: string
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          organizer: string | null
+          participants_count: number | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          activity_date: string
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          organizer?: string | null
+          participants_count?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          activity_date?: string
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          organizer?: string | null
+          participants_count?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       households: {
         Row: {
           created_at: string

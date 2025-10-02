@@ -1,101 +1,175 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Plus, Users } from "lucide-react";
-
-const activities = [
-  { 
-    id: 1, 
-    name: "Community Clean-up Drive", 
-    date: "March 15, 2025", 
-    status: "Upcoming",
-    participants: 45,
-    budget: "₱5,000"
-  },
-  { 
-    id: 2, 
-    name: "Feeding Program for Children", 
-    date: "March 10, 2025", 
-    status: "Ongoing",
-    participants: 120,
-    budget: "₱15,000"
-  },
-  { 
-    id: 3, 
-    name: "Senior Citizens Checkup", 
-    date: "March 5, 2025", 
-    status: "Completed",
-    participants: 67,
-    budget: "₱8,000"
-  },
-  { 
-    id: 4, 
-    name: "Vaccination Drive", 
-    date: "March 20, 2025", 
-    status: "Upcoming",
-    participants: 200,
-    budget: "₱25,000"
-  },
-];
+import { Trash2, Calendar, MapPin, Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import AddActivityDialog from "@/components/AddActivityDialog";
+import EditActivityDialog from "@/components/EditActivityDialog";
+import { format } from "date-fns";
 
 export default function Activities() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: activities, isLoading } = useQuery({
+    queryKey: ["activities"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("activities")
+        .select("*")
+        .order("activity_date", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this activity?")) return;
+
+    const { error } = await supabase.from("activities").delete().eq("id", id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Activity deleted successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Scheduled":
+        return "default";
+      case "Ongoing":
+        return "secondary";
+      case "Completed":
+        return "outline";
+      case "Cancelled":
+        return "destructive";
+      default:
+        return "outline";
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Activities & Programs</h2>
-          <p className="text-sm text-muted-foreground">Manage barangay events and community programs</p>
+          <h1 className="text-3xl font-bold tracking-tight">Barangay Activities</h1>
+          <p className="text-muted-foreground">
+            Manage community events and activities
+          </p>
         </div>
-        <Button className="gap-2 bg-gradient-to-r from-accent to-accent/80 hover:opacity-90">
-          <Plus className="h-4 w-4" />
-          New Activity
-        </Button>
+        <AddActivityDialog />
       </div>
 
-      {/* Activities Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {activities.map((activity) => (
-          <Card key={activity.id} className="transition-all hover:shadow-lg">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-lg">{activity.name}</CardTitle>
-                  <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    {activity.date}
-                  </p>
-                </div>
-                <Badge 
-                  className={
-                    activity.status === "Completed" 
-                      ? "bg-muted text-muted-foreground" 
-                      : activity.status === "Ongoing"
-                      ? "bg-accent/10 text-accent hover:bg-accent/20"
-                      : "bg-primary/10 text-primary hover:bg-primary/20"
-                  }
-                >
-                  {activity.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4" />
-                  <span>{activity.participants} participants</span>
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {activity.budget}
-                </div>
-              </div>
-              <Button variant="outline" className="mt-4 w-full">
-                View Details
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Activities & Events</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="text-center py-8">Loading...</div>
+          ) : activities?.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No activities found. Add your first activity to get started.
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Activity</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Participants</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {activities?.map((activity) => (
+                  <TableRow key={activity.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{activity.title}</div>
+                        {activity.description && (
+                          <div className="text-sm text-muted-foreground line-clamp-1">
+                            {activity.description}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{activity.activity_type}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1 text-sm">
+                        <Calendar className="h-3 w-3" />
+                        {format(new Date(activity.activity_date), "MMM dd, yyyy")}
+                        <span className="text-muted-foreground">
+                          {format(new Date(activity.activity_date), "hh:mm a")}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {activity.location && (
+                        <div className="flex items-center gap-1 text-sm">
+                          <MapPin className="h-3 w-3" />
+                          {activity.location}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {activity.participants_count !== null && (
+                        <div className="flex items-center gap-1 text-sm">
+                          <Users className="h-3 w-3" />
+                          {activity.participants_count}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusColor(activity.status)}>
+                        {activity.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <EditActivityDialog activity={activity} />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(activity.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
