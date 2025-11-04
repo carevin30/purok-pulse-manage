@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
-import StatCard from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Home, Calendar, ClipboardList, TrendingUp, Bell } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+import { Users, Home, FileText, Share2, Calendar, TrendingUp, TrendingDown } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Area, AreaChart, Line, LineChart } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-const notifications = [
-  { id: 1, type: "Birth Registration", message: "New birth registration submitted", time: "2 hours ago" },
-  { id: 2, type: "Event", message: "Community clean-up drive tomorrow", time: "5 hours ago" },
-  { id: 3, type: "Report", message: "Street light maintenance request", time: "1 day ago" },
-];
 
 const COLORS = {
   Male: "hsl(var(--primary))",
   Female: "hsl(var(--accent))",
+};
+
+const STAT_COLORS = {
+  primary: "hsl(142 18% 45%)",
+  accent: "hsl(29 35% 60%)",
+  destructive: "hsl(0 72% 51%)",
+  info: "hsl(200 80% 50%)",
 };
 
 
@@ -108,104 +108,176 @@ export default function Dashboard() {
   };
 
   const growthRate = totalResidents > 0 ? "+5.2%" : "0%";
+  const currentDate = new Date();
+  const monthName = currentDate.toLocaleString('default', { month: 'long' }).toUpperCase();
+  const dayNumber = currentDate.getDate();
 
   return (
-    <div className="space-y-6">
-      {/* Hero Section - Total Residents */}
-      <Card className="bg-gradient-to-br from-primary/90 to-primary border-none shadow-strong">
-        <CardContent className="p-8">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-primary-foreground/80">Total Population</p>
-              <div className="flex items-baseline gap-3">
-                <h1 className="text-5xl font-bold text-primary-foreground">
-                  {isLoading ? "..." : totalResidents.toLocaleString()}
-                </h1>
-                <span className="text-sm font-medium text-primary-foreground/80">{growthRate}</span>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button className="px-6 py-2.5 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent/90 transition-colors shadow-md">
-                Add Resident
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stats Row */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Households Card */}
-        <Card className="hover:shadow-medium transition-all">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-accent/10">
-                <Home className="h-6 w-6 text-accent" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground">Households</p>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <p className="text-2xl font-bold">{isLoading ? "..." : totalHouseholds.toLocaleString()}</p>
-                  <span className="text-xs font-medium text-accent">+2.1%</span>
+    <div className="space-y-4 p-6">
+      {/* Top Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        {/* Circular Progress Card */}
+        <Card className="bg-card border-border shadow-soft hover:shadow-medium transition-shadow">
+          <CardContent className="p-6 flex flex-col items-center justify-center">
+            <div className="relative w-32 h-32">
+              <svg className="transform -rotate-90 w-32 h-32">
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="56"
+                  stroke="hsl(var(--muted))"
+                  strokeWidth="8"
+                  fill="none"
+                />
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="56"
+                  stroke={STAT_COLORS.primary}
+                  strokeWidth="8"
+                  fill="none"
+                  strokeDasharray={`${(totalResidents / 10000) * 351.86} 351.86`}
+                  strokeLinecap="round"
+                />
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="48"
+                  stroke={STAT_COLORS.accent}
+                  strokeWidth="8"
+                  fill="none"
+                  strokeDasharray={`${(totalHouseholds / 2000) * 301.59} 301.59`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-foreground">{totalResidents}</p>
+                  <p className="text-xs text-muted-foreground">{totalHouseholds}</p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">vs. Last Month</p>
               </div>
             </div>
+            <button className="mt-4 px-4 py-1.5 bg-muted text-foreground text-xs rounded hover:bg-muted/80 transition-colors">
+              READ MORE
+            </button>
           </CardContent>
         </Card>
 
-        {/* Activities Card */}
-        <Card className="hover:shadow-medium transition-all">
+        {/* Total Residents Stat */}
+        <Card className="shadow-soft hover:shadow-medium transition-shadow" style={{ backgroundColor: STAT_COLORS.primary }}>
           <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <Calendar className="h-6 w-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground">Activities</p>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <p className="text-2xl font-bold">8</p>
-                  <span className="text-xs font-medium text-primary">Ongoing</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
-              </div>
+            <div className="flex items-center justify-between mb-2">
+              <Users className="h-8 w-8 text-white/90" />
             </div>
+            <p className="text-sm font-medium text-white/80 mb-1">TOTAL RESIDENTS</p>
+            <p className="text-3xl font-bold text-white">{isLoading ? "..." : totalResidents.toLocaleString()}</p>
           </CardContent>
         </Card>
 
-        {/* Reports Card */}
-        <Card className="hover:shadow-medium transition-all">
+        {/* Total Households Stat */}
+        <Card className="shadow-soft hover:shadow-medium transition-shadow" style={{ backgroundColor: STAT_COLORS.accent }}>
           <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-destructive/10">
-                <ClipboardList className="h-6 w-6 text-destructive" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground">Reports</p>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <p className="text-2xl font-bold">23</p>
-                  <span className="text-xs font-medium text-destructive">15 Pending</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
+            <div className="flex items-center justify-between mb-2">
+              <Home className="h-8 w-8 text-white/90" />
+            </div>
+            <p className="text-sm font-medium text-white/80 mb-1">HOUSEHOLDS</p>
+            <p className="text-3xl font-bold text-white">{isLoading ? "..." : totalHouseholds.toLocaleString()}</p>
+          </CardContent>
+        </Card>
+
+        {/* Reports Stat */}
+        <Card className="shadow-soft hover:shadow-medium transition-shadow" style={{ backgroundColor: STAT_COLORS.destructive }}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <FileText className="h-8 w-8 text-white/90" />
+            </div>
+            <p className="text-sm font-medium text-white/80 mb-1">REPORTS VIEW</p>
+            <p className="text-3xl font-bold text-white">23</p>
+          </CardContent>
+        </Card>
+
+        {/* Calendar Widget */}
+        <Card className="bg-card border-border shadow-soft hover:shadow-medium transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center justify-center h-full">
+              <p className="text-xs font-medium text-muted-foreground mb-2">{monthName}</p>
+              <p className="text-5xl font-bold text-foreground mb-2">{dayNumber}</p>
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="h-4 w-4" style={{ color: STAT_COLORS.info }} />
+                <span className="text-muted-foreground">Today</span>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Progress Bars Card */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="bg-card border-border shadow-soft">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold">Population Metrics</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Male</span>
+                <span className="font-semibold text-foreground">
+                  {genderData.find(g => g.name === "Male")?.value || 0}
+                </span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-2">
+                <div 
+                  className="h-2 rounded-full transition-all" 
+                  style={{ 
+                    backgroundColor: STAT_COLORS.primary,
+                    width: `${totalResidents > 0 ? ((genderData.find(g => g.name === "Male")?.value || 0) / totalResidents * 100) : 0}%` 
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Female</span>
+                <span className="font-semibold text-foreground">
+                  {genderData.find(g => g.name === "Female")?.value || 0}
+                </span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-2">
+                <div 
+                  className="h-2 rounded-full transition-all" 
+                  style={{ 
+                    backgroundColor: STAT_COLORS.accent,
+                    width: `${totalResidents > 0 ? ((genderData.find(g => g.name === "Female")?.value || 0) / totalResidents * 100) : 0}%` 
+                  }}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats */}
+        <Card className="bg-card border-border shadow-soft">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold">Age Groups</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {ageData.map((item, index) => (
+              <div key={item.age} className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">{item.age} years</span>
+                <span className="text-sm font-semibold text-foreground">{item.population}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Charts Section */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Age Distribution Chart - Takes 2 columns */}
-        <Card className="lg:col-span-2">
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Age Distribution Area Chart */}
+        <Card className="bg-card border-border shadow-soft">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                Age Distribution
-              </CardTitle>
-              <div className="flex gap-1 text-xs">
-                <button className="px-3 py-1 bg-primary text-primary-foreground rounded-md font-medium">Weekly</button>
-                <button className="px-3 py-1 hover:bg-muted rounded-md">Monthly</button>
-              </div>
+              <CardTitle className="text-base font-semibold">Age Distribution</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -215,7 +287,21 @@ export default function Dashboard() {
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={ageData}>
+                <AreaChart data={ageData}>
+                  <defs>
+                    <linearGradient id="colorPopulation1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={STAT_COLORS.destructive} stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor={STAT_COLORS.destructive} stopOpacity={0.1}/>
+                    </linearGradient>
+                    <linearGradient id="colorPopulation2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={STAT_COLORS.accent} stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor={STAT_COLORS.accent} stopOpacity={0.1}/>
+                    </linearGradient>
+                    <linearGradient id="colorPopulation3" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={STAT_COLORS.primary} stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor={STAT_COLORS.primary} stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis 
                     dataKey="age" 
@@ -236,66 +322,76 @@ export default function Dashboard() {
                       border: "1px solid hsl(var(--border))",
                       borderRadius: "var(--radius)",
                     }}
-                    cursor={{ fill: "hsl(var(--accent) / 0.1)" }}
                   />
-                  <Bar 
+                  <Area 
+                    type="monotone" 
                     dataKey="population" 
-                    fill="hsl(var(--primary))" 
-                    radius={[8, 8, 0, 0]}
+                    stroke={STAT_COLORS.primary}
+                    fillOpacity={1}
+                    fill="url(#colorPopulation3)"
                   />
-                </BarChart>
+                </AreaChart>
               </ResponsiveContainer>
             )}
           </CardContent>
         </Card>
 
-        {/* Gender Distribution - Compact Card */}
-        <Card>
+        {/* Gender Distribution Multi-line Chart */}
+        <Card className="bg-card border-border shadow-soft">
           <CardHeader>
-            <CardTitle className="text-lg">Gender Split</CardTitle>
+            <CardTitle className="text-base font-semibold">Trends Overview</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center h-[280px] text-muted-foreground">
                 Loading...
               </div>
-            ) : genderData.every((item) => item.value === 0) ? (
-              <div className="flex items-center justify-center h-[280px] text-muted-foreground">
-                No data
-              </div>
             ) : (
               <div className="space-y-4">
-                <ResponsiveContainer width="100%" height={180}>
-                  <PieChart>
-                    <Pie
-                      data={genderData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={70}
-                      fill="#8884d8"
-                      dataKey="value"
-                      paddingAngle={2}
-                    >
-                      {genderData.map((entry) => (
-                        <Cell key={`cell-${entry.name}`} fill={COLORS[entry.name as keyof typeof COLORS]} />
-                      ))}
-                    </Pie>
-                  </PieChart>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={ageData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="age" 
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={11}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={11}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "var(--radius)",
+                        fontSize: "12px",
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="population" 
+                      stroke={STAT_COLORS.accent} 
+                      strokeWidth={2}
+                      dot={{ fill: STAT_COLORS.accent, r: 4 }}
+                    />
+                  </LineChart>
                 </ResponsiveContainer>
-                <div className="space-y-2">
-                  {genderData.map((item) => (
-                    <div key={item.name} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                <div className="grid grid-cols-2 gap-4">
+                  {genderData.map((item, idx) => (
+                    <div key={item.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                       <div className="flex items-center gap-2">
                         <div 
                           className="w-3 h-3 rounded-full" 
                           style={{ backgroundColor: COLORS[item.name as keyof typeof COLORS] }}
                         />
-                        <span className="text-sm font-medium">{item.name}</span>
+                        <span className="text-xs font-medium text-foreground">{item.name}</span>
                       </div>
-                      <span className="text-sm font-bold">
-                        {((item.value / totalResidents) * 100).toFixed(1)}%
-                      </span>
+                      <span className="text-xs font-bold text-foreground">{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -304,38 +400,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Updates */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Bell className="h-5 w-5 text-accent" />
-              Recent Updates
-            </CardTitle>
-            <button className="text-sm font-medium text-primary hover:underline">See All</button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {notifications.map((notif) => (
-              <div
-                key={notif.id}
-                className="flex items-start gap-4 p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
-              >
-                <div className="p-2 rounded-lg bg-accent/10">
-                  <Bell className="h-4 w-4 text-accent" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold">{notif.type}</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">{notif.message}</p>
-                </div>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">{notif.time}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
