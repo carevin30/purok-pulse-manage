@@ -45,6 +45,9 @@ type Certificate = {
   residents: {
     first_name: string;
     last_name: string;
+    house_number: string | null;
+    purok: string | null;
+    street_address: string | null;
   } | null;
 };
 
@@ -64,7 +67,7 @@ export default function Certificates() {
     setLoading(true);
     const { data, error } = await supabase
       .from("certificates")
-      .select("*, residents(first_name, last_name)")
+      .select("*, residents(first_name, last_name, house_number, purok, street_address)")
       .order("issued_date", { ascending: false });
 
     if (error) {

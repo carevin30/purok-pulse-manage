@@ -26,6 +26,9 @@ type Certificate = {
   residents: {
     first_name: string;
     last_name: string;
+    house_number: string | null;
+    purok: string | null;
+    street_address: string | null;
   } | null;
 };
 
@@ -105,46 +108,52 @@ export default function ViewCertificateDialog({
     </>
   );
 
-  const renderResidencyContent = () => (
-    <>
-      <p className="font-semibold mb-6">TO WHOM IT MAY CONCERN:</p>
-      
-      <p className="text-justify leading-relaxed mb-6 indent-12">
-        THIS IS TO CERTIFY that as per records available in this office, Mr./Ms.{" "}
-        <u className="font-bold">
-          {certificate.residents
-            ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
-            : "_______________"}
-        </u>
-        , male/female, married/single, of legal age, Filipino citizen is a bonafide resident of Barangay Cataratan, Allacapan, Cagayan.
-      </p>
+  const renderResidencyContent = () => {
+    const residentAddress = certificate.residents?.house_number 
+      ? `${certificate.residents.house_number}, Poblacion, Lagangilang, Abra 2802`
+      : "Poblacion, Lagangilang, Abra 2802";
+    
+    return (
+      <>
+        <p className="font-semibold mb-6">TO WHOM IT MAY CONCERN:</p>
+        
+        <p className="text-justify leading-relaxed mb-6 indent-12">
+          THIS IS TO CERTIFY that as per records available in this office, Mr./Ms.{" "}
+          <u className="font-bold">
+            {certificate.residents
+              ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
+              : "_______________"}
+          </u>
+          , male/female, married/single, of legal age, Filipino citizen is a bonafide resident of {residentAddress}.
+        </p>
 
-      <p className="text-justify leading-relaxed mb-8 indent-12">
-        CERTIFYING FURTHER, that above-named person, is a person of good moral character and has no derogatory and/or criminal records in the barangay.
-      </p>
+        <p className="text-justify leading-relaxed mb-8 indent-12">
+          CERTIFYING FURTHER, that above-named person, is a person of good moral character and has no derogatory and/or criminal records in the barangay.
+        </p>
 
-      <p className="leading-relaxed mb-24 indent-12">
-        ISSUED this{" "}
-        <u className="font-semibold px-8">
-          {format(new Date(certificate.issued_date), "do")}
-        </u>{" "}
-        day of{" "}
-        <u className="font-semibold px-8">
-          {format(new Date(certificate.issued_date), "MMMM")}
-        </u>{" "}
-        2014 at Cataratan, Allacapan, Cagayan.
-      </p>
+        <p className="leading-relaxed mb-24 indent-12">
+          ISSUED this{" "}
+          <u className="font-semibold px-8">
+            {format(new Date(certificate.issued_date), "do")}
+          </u>{" "}
+          day of{" "}
+          <u className="font-semibold px-8">
+            {format(new Date(certificate.issued_date), "MMMM")}
+          </u>{" "}
+          {format(new Date(certificate.issued_date), "yyyy")} at Poblacion, Lagangilang, Abra.
+        </p>
 
-      <div className="flex justify-end">
-        <div className="text-center">
-          <p className="font-bold text-base border-b border-foreground inline-block px-12">
-            {certificate.issued_by || "JONATHAN A. TUNAC"}
-          </p>
-          <p className="text-sm mt-1">Punong Barangay</p>
+        <div className="flex justify-end">
+          <div className="text-center">
+            <p className="font-bold text-base border-b border-foreground inline-block px-12">
+              {certificate.issued_by || "ARMANDO D. DEVELOS"}
+            </p>
+            <p className="text-sm mt-1">Punong Barangay</p>
+          </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  };
 
   const renderBusinessPermitContent = () => (
     <div className="relative">
