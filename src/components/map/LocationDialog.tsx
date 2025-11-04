@@ -40,13 +40,17 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
       map.current = null;
     }
 
-    // Initialize map
-    map.current = new maplibregl.Map({
-      container: mapContainer.current,
-      style: 'https://tiles.openfreemap.org/styles/liberty',
-      center: [lng, lat],
-      zoom: 16,
-    });
+    // Wait for dialog animation to complete before initializing map
+    const timeoutId = setTimeout(() => {
+      if (!mapContainer.current) return;
+
+      // Initialize map
+      map.current = new maplibregl.Map({
+        container: mapContainer.current,
+        style: 'https://tiles.openfreemap.org/styles/liberty',
+        center: [lng, lat],
+        zoom: 16,
+      });
 
     // Add navigation controls
     map.current.addControl(
@@ -63,14 +67,16 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
       .setLngLat([lng, lat])
       .addTo(map.current);
 
-    // Resize map after load to ensure proper rendering
-    map.current.on('load', () => {
-      setTimeout(() => {
-        map.current?.resize();
-      }, 100);
-    });
+      // Resize map after load to ensure proper rendering
+      map.current.on('load', () => {
+        setTimeout(() => {
+          map.current?.resize();
+        }, 100);
+      });
+    }, 200);
 
     return () => {
+      clearTimeout(timeoutId);
       marker.current?.remove();
       map.current?.remove();
       map.current = null;
