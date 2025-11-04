@@ -10,7 +10,9 @@ import {
   Calendar,
   ClipboardList,
   Settings,
-  LogOut
+  LogOut,
+  Award,
+  FolderOpen
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -24,6 +26,8 @@ const navigation = [
   { name: "Ordinances", href: "/ordinances", icon: FileText },
   { name: "Activities", href: "/activities", icon: Calendar },
   { name: "Reports", href: "/reports", icon: ClipboardList },
+  { name: "Certificates", href: "/certificates", icon: Award },
+  { name: "Documents", href: "/documents", icon: FolderOpen },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 

@@ -101,6 +101,124 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          certificate_number: string
+          certificate_type: Database["public"]["Enums"]["certificate_type"]
+          created_at: string
+          id: string
+          issued_by: string | null
+          issued_date: string
+          notes: string | null
+          purpose: string | null
+          resident_id: string | null
+          status: string
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          certificate_number: string
+          certificate_type: Database["public"]["Enums"]["certificate_type"]
+          created_at?: string
+          id?: string
+          issued_by?: string | null
+          issued_date?: string
+          notes?: string | null
+          purpose?: string | null
+          resident_id?: string | null
+          status?: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          certificate_number?: string
+          certificate_type?: Database["public"]["Enums"]["certificate_type"]
+          created_at?: string
+          id?: string
+          issued_by?: string | null
+          issued_date?: string
+          notes?: string | null
+          purpose?: string | null
+          resident_id?: string | null
+          status?: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          category: Database["public"]["Enums"]["document_category"]
+          created_at: string
+          description: string | null
+          document_number: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string | null
+          id: string
+          is_archived: boolean | null
+          parent_document_id: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+          version: number | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["document_category"]
+          created_at?: string
+          description?: string | null
+          document_number?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          is_archived?: boolean | null
+          parent_document_id?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+          version?: number | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["document_category"]
+          created_at?: string
+          description?: string | null
+          document_number?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          is_archived?: boolean | null
+          parent_document_id?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_parent_document_id_fkey"
+            columns: ["parent_document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       households: {
         Row: {
           created_at: string
@@ -423,6 +541,22 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "staff" | "viewer"
+      certificate_type:
+        | "barangay_clearance"
+        | "certificate_of_residency"
+        | "certificate_of_indigency"
+        | "business_permit"
+        | "good_moral"
+        | "first_time_job_seeker"
+      document_category:
+        | "resolution"
+        | "memorandum"
+        | "ordinance"
+        | "report"
+        | "financial"
+        | "legal"
+        | "correspondence"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -551,6 +685,24 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "staff", "viewer"],
+      certificate_type: [
+        "barangay_clearance",
+        "certificate_of_residency",
+        "certificate_of_indigency",
+        "business_permit",
+        "good_moral",
+        "first_time_job_seeker",
+      ],
+      document_category: [
+        "resolution",
+        "memorandum",
+        "ordinance",
+        "report",
+        "financial",
+        "legal",
+        "correspondence",
+        "other",
+      ],
     },
   },
 } as const

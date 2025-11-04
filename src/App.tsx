@@ -13,6 +13,8 @@ import Activities from "./pages/Activities";
 import Ordinances from "./pages/Ordinances";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Certificates from "./pages/Certificates";
+import Documents from "./pages/Documents";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 
@@ -41,6 +43,8 @@ const App: React.FC = () => {
               <Route path="ordinances" element={<Ordinances />} />
               <Route path="activities" element={<Activities />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="certificates" element={<Certificates />} />
+              <Route path="documents" element={<Documents />} />
               <Route path="settings" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
