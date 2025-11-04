@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -40,46 +41,53 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
       map.current = null;
     }
 
-    // Wait for dialog animation to complete before initializing map
+    // Wait for dialog to be fully rendered
     const timeoutId = setTimeout(() => {
       if (!mapContainer.current) return;
 
-      // Initialize map
-      map.current = new maplibregl.Map({
-        container: mapContainer.current,
-        style: 'https://tiles.openfreemap.org/styles/liberty',
-        center: [lng, lat],
-        zoom: 16,
-      });
+      try {
+        // Initialize map
+        map.current = new maplibregl.Map({
+          container: mapContainer.current,
+          style: 'https://tiles.openfreemap.org/styles/liberty',
+          center: [lng, lat],
+          zoom: 16,
+        });
 
-    // Add navigation controls
-    map.current.addControl(
-      new maplibregl.NavigationControl({
-        visualizePitch: false,
-      }),
-      'top-right'
-    );
+        // Add navigation controls
+        map.current.addControl(
+          new maplibregl.NavigationControl({
+            visualizePitch: false,
+          }),
+          'top-right'
+        );
 
-    // Create marker
-    marker.current = new maplibregl.Marker({
-      color: '#5D866C',
-    })
-      .setLngLat([lng, lat])
-      .addTo(map.current);
+        // Create marker
+        marker.current = new maplibregl.Marker({
+          color: '#5D866C',
+        })
+          .setLngLat([lng, lat])
+          .addTo(map.current);
 
-      // Resize map after load to ensure proper rendering
-      map.current.on('load', () => {
-        setTimeout(() => {
+        // Resize map after load to ensure proper rendering
+        map.current.on('load', () => {
           map.current?.resize();
-        }, 100);
-      });
-    }, 200);
+        });
+      } catch (error) {
+        console.error('Error initializing map:', error);
+      }
+    }, 300);
 
     return () => {
       clearTimeout(timeoutId);
-      marker.current?.remove();
-      map.current?.remove();
+      if (marker.current) {
+        marker.current.remove();
+      }
+      if (map.current) {
+        map.current.remove();
+      }
       map.current = null;
+      marker.current = null;
     };
   }, [open, lat, lng]);
 
@@ -88,6 +96,9 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
+            View the location on the map
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           {address && (
