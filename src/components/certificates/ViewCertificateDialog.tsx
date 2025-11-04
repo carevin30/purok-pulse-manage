@@ -107,40 +107,40 @@ export default function ViewCertificateDialog({
 
   const renderResidencyContent = () => (
     <>
-      <p className="font-semibold">TO WHOM IT MAY CONCERN:</p>
+      <p className="font-semibold mb-6">TO WHOM IT MAY CONCERN:</p>
       
-      <p className="text-justify leading-relaxed">
+      <p className="text-justify leading-relaxed mb-6 indent-12">
         THIS IS TO CERTIFY that as per records available in this office, Mr./Ms.{" "}
-        <span className="font-bold">
+        <u className="font-bold">
           {certificate.residents
             ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
             : "_______________"}
-        </span>
+        </u>
         , male/female, married/single, of legal age, Filipino citizen is a bonafide resident of Barangay Cataratan, Allacapan, Cagayan.
       </p>
 
-      <p className="text-justify leading-relaxed">
+      <p className="text-justify leading-relaxed mb-8 indent-12">
         CERTIFYING FURTHER, that above-named person, is a person of good moral character and has no derogatory and/or criminal records in the barangay.
       </p>
 
-      <p className="leading-relaxed mt-6">
+      <p className="leading-relaxed mb-24 indent-12">
         ISSUED this{" "}
-        <span className="font-semibold">
+        <u className="font-semibold px-8">
           {format(new Date(certificate.issued_date), "do")}
-        </span>{" "}
+        </u>{" "}
         day of{" "}
-        <span className="font-semibold">
-          {format(new Date(certificate.issued_date), "MMMM yyyy")}
-        </span>{" "}
-        at Cataratan, Allacapan, Cagayan.
+        <u className="font-semibold px-8">
+          {format(new Date(certificate.issued_date), "MMMM")}
+        </u>{" "}
+        2014 at Cataratan, Allacapan, Cagayan.
       </p>
 
-      <div className="mt-16 flex justify-end">
+      <div className="flex justify-end">
         <div className="text-center">
-          <p className="font-bold text-lg">
+          <p className="font-bold text-base border-b border-foreground inline-block px-12">
             {certificate.issued_by || "JONATHAN A. TUNAC"}
           </p>
-          <p className="text-sm">Punong Barangay</p>
+          <p className="text-sm mt-1">Punong Barangay</p>
         </div>
       </div>
     </>
