@@ -43,26 +43,7 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
     // Initialize map
     map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: {
-        version: 8,
-        sources: {
-          'openfreemap': {
-            type: 'raster',
-            tiles: ['https://tiles.openfreemap.org/styles/liberty/{z}/{x}/{y}.png'],
-            tileSize: 256,
-            attribution: '© OpenFreeMap contributors'
-          }
-        },
-        layers: [
-          {
-            id: 'openfreemap-layer',
-            type: 'raster',
-            source: 'openfreemap',
-            minzoom: 0,
-            maxzoom: 19
-          }
-        ]
-      },
+      style: 'https://tiles.openfreemap.org/styles/liberty',
       center: [lng, lat],
       zoom: 16,
     });
