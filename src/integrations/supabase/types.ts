@@ -548,6 +548,7 @@ export type Database = {
         | "business_permit"
         | "good_moral"
         | "first_time_job_seeker"
+        | "residency"
       document_category:
         | "resolution"
         | "memorandum"
@@ -692,6 +693,7 @@ export const Constants = {
         "business_permit",
         "good_moral",
         "first_time_job_seeker",
+        "residency",
       ],
       document_category: [
         "resolution",

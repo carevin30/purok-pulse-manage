@@ -9,6 +9,7 @@ import {
 import { Eye, Download } from "lucide-react";
 import { format } from "date-fns";
 import barangayLogo from "@/assets/barangay-logo.png";
+import barangayTangboLogo from "@/assets/barangay-tangbo-logo.png";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useRef } from "react";
@@ -43,6 +44,172 @@ export default function ViewCertificateDialog({
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
+
+  const renderIndigencyContent = () => (
+    <>
+      <p className="font-semibold">TO WHOM IT MAY CONCERN:</p>
+      
+      <p className="text-justify leading-relaxed">
+        This is to CERTIFY that{" "}
+        <span className="font-bold">
+          {certificate.residents
+            ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
+            : "N/A"}
+        </span>
+        , years old, single, a bona fide resident of Purok 7, Barangay Poblacion, Lagangilang, Abra.
+      </p>
+
+      <p className="text-justify leading-relaxed">
+        Certified further that the above named-person is belonging to an indigent family and highly recommended to avail any privileges.
+      </p>
+
+      {certificate.purpose && (
+        <p className="text-justify leading-relaxed">
+          This Certification is hereby issued upon the personal request of the above named-person for {certificate.purpose}.
+        </p>
+      )}
+
+      <p className="leading-relaxed">
+        Issued this{" "}
+        <span className="font-semibold">
+          {format(new Date(certificate.issued_date), "do")}
+        </span>{" "}
+        day of{" "}
+        <span className="font-semibold">
+          {format(new Date(certificate.issued_date), "MMMM yyyy")}
+        </span>{" "}
+        at Barangay Poblacion, Lagangilang, Abra.
+      </p>
+
+      <div className="mt-8">
+        <p className="font-bold">
+          {certificate.residents
+            ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
+            : "N/A"}
+        </p>
+        <p className="text-xs">Affiant</p>
+      </div>
+
+      <div className="mt-8">
+        <p className="text-xs italic">Not valid without dry seal</p>
+      </div>
+
+      <div className="mt-12 flex justify-center">
+        <div className="text-center">
+          <p className="font-bold">
+            Hon. {certificate.issued_by || "ARMANDO D. DEVELOS"}
+          </p>
+          <p className="text-xs">Punong Barangay</p>
+        </div>
+      </div>
+    </>
+  );
+
+  const renderResidencyContent = () => (
+    <>
+      <p className="font-semibold">TO WHOM IT MAY CONCERN:</p>
+      
+      <p className="text-justify leading-relaxed">
+        THIS IS TO CERTIFY that as per records available in this office, Mr./Ms.{" "}
+        <span className="font-bold">
+          {certificate.residents
+            ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
+            : "_______________"}
+        </span>
+        , male/female, married/single, of legal age, Filipino citizen is a bonafide resident of Barangay Cataratan, Allacapan, Cagayan.
+      </p>
+
+      <p className="text-justify leading-relaxed">
+        CERTIFYING FURTHER, that above-named person, is a person of good moral character and has no derogatory and/or criminal records in the barangay.
+      </p>
+
+      <p className="leading-relaxed mt-6">
+        ISSUED this{" "}
+        <span className="font-semibold">
+          {format(new Date(certificate.issued_date), "do")}
+        </span>{" "}
+        day of{" "}
+        <span className="font-semibold">
+          {format(new Date(certificate.issued_date), "MMMM yyyy")}
+        </span>{" "}
+        at Cataratan, Allacapan, Cagayan.
+      </p>
+
+      <div className="mt-16 flex justify-end">
+        <div className="text-center">
+          <p className="font-bold text-lg">
+            {certificate.issued_by || "JONATHAN A. TUNAC"}
+          </p>
+          <p className="text-sm">Punong Barangay</p>
+        </div>
+      </div>
+    </>
+  );
+
+  const renderBusinessPermitContent = () => (
+    <div className="relative">
+      <div className="absolute inset-0 flex items-center justify-center opacity-10">
+        <img 
+          src={barangayTangboLogo} 
+          alt="Watermark" 
+          className="w-96 h-96 object-contain"
+        />
+      </div>
+      <div className="relative z-10">
+        <p className="font-semibold text-center mb-4">TO WHOM IT MAY CONCERN:</p>
+        
+        <p className="text-justify leading-relaxed mb-4">
+          This clearance is hereby granted to{" "}
+          <span className="font-bold">
+            {certificate.residents
+              ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
+              : "_______________"}
+          </span>{" "}
+          with business address at Barangay Tangbo, Arteche Eastern Samar, to operate or engage in business trade or occupation in the vicinity of the Barangay for:
+        </p>
+
+        <div className="mb-4 pl-8">
+          <p>Nature of Business:</p>
+          <p className="font-semibold">{certificate.purpose || "NEW"}</p>
+          <p className="font-semibold">RENEWAL</p>
+        </div>
+
+        <p className="text-justify leading-relaxed mb-4">
+          As having been complied with the requirements of the Barangay.
+        </p>
+
+        <p className="text-justify leading-relaxed mb-6">
+          This clearance is issued upon request of the herein interested party for whatever purpose it may serve.
+        </p>
+
+        <p className="mb-8">
+          Issued this{" "}
+          <span className="font-semibold">
+            {format(new Date(certificate.issued_date), "do")}
+          </span>{" "}
+          day of{" "}
+          <span className="font-semibold">
+            {format(new Date(certificate.issued_date), "MMMM yyyy")}
+          </span>.
+        </p>
+
+        <div className="flex justify-between items-end mt-12">
+          <div>
+            <p className="text-sm">Attested by:</p>
+            <p className="font-bold mt-8 border-t border-foreground pt-1">MR. DEXTER GIL D. MONTANCES</p>
+            <p className="text-xs italic">Barangay Secretary</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm">Approved by:</p>
+            <p className="font-bold mt-8 border-t border-foreground pt-1">
+              {certificate.issued_by || "HON. ANTONIO M. MEJICA"}
+            </p>
+            <p className="text-xs italic">Barangay Chairman</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   const handleDownloadPDF = async () => {
     if (!certificateRef.current) return;
@@ -102,89 +269,57 @@ export default function ViewCertificateDialog({
 
         <div ref={certificateRef} className="border-2 border-foreground rounded-lg p-8 bg-white">
           {/* Header with Logo */}
-          <div className="flex items-start gap-4 mb-6">
-            <img 
-              src={barangayLogo} 
-              alt="Barangay Logo" 
-              className="w-32 h-32 object-contain"
-            />
-            <div className="flex-1 text-center">
+          {certificate.certificate_type === 'business_permit' ? (
+            <div className="text-center mb-6">
+              <img 
+                src={barangayLogo} 
+                alt="Barangay Logo" 
+                className="w-24 h-24 object-contain mx-auto mb-2"
+              />
               <p className="text-sm font-semibold">Republic of the Philippines</p>
-              <p className="text-sm font-semibold">Province of Abra</p>
-              <p className="text-sm font-semibold">Municipality of Lagangilang</p>
-              <p className="text-sm font-semibold">Barangay Poblacion</p>
-              <p className="text-xs font-bold mt-1">OFFICE OF THE PUNONG BARANGAY</p>
+              <p className="text-sm font-semibold">Province of Eastern Samar</p>
+              <p className="text-sm font-semibold">Municipality of ARTECHE</p>
+              <p className="text-base font-bold">BARANGAY TANGBO</p>
+              <p className="text-sm font-bold mt-2">OFFICE OF THE BARANGAY CHAIRMAN</p>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-start gap-4 mb-6">
+              <img 
+                src={barangayLogo} 
+                alt="Barangay Logo" 
+                className="w-32 h-32 object-contain"
+              />
+              <div className="flex-1 text-center">
+                <p className="text-sm font-semibold">Republic of the Philippines</p>
+                <p className="text-sm font-semibold">
+                  {certificate.certificate_type === 'residency' ? 'Province of Cagayan' : 'Province of Abra'}
+                </p>
+                <p className="text-sm font-semibold">
+                  {certificate.certificate_type === 'residency' ? 'Municipality of Allacapan' : 'Municipality of Lagangilang'}
+                </p>
+                <p className="text-sm font-semibold">
+                  {certificate.certificate_type === 'residency' ? 'Barangay Cataratan' : 'Barangay Poblacion'}
+                </p>
+                <p className="text-xs font-bold mt-1">OFFICE OF THE PUNONG BARANGAY</p>
+              </div>
+            </div>
+          )}
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold uppercase text-green-600">
-              {getCertificateTypeLabel(certificate.certificate_type)}
+            <h3 className="text-2xl font-bold uppercase" style={{ color: certificate.certificate_type === 'business_permit' ? '#000' : '#16a34a' }}>
+              {certificate.certificate_type === 'business_permit' 
+                ? 'BARANGAY BUSINESS CLEARANCE' 
+                : getCertificateTypeLabel(certificate.certificate_type)}
             </h3>
           </div>
 
           <div className="space-y-6 text-sm">
-            {/* Body */}
+            {/* Body Content Based on Type */}
             <div className="space-y-4">
-              <p className="font-semibold">TO WHOM IT MAY CONCERN:</p>
-              
-              <p className="text-justify leading-relaxed">
-                This is to CERTIFY that{" "}
-                <span className="font-bold">
-                  {certificate.residents
-                    ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
-                    : "N/A"}
-                </span>
-                , years old, single, a bona fide resident of Purok 7, Barangay Poblacion, Lagangilang, Abra.
-              </p>
-
-              <p className="text-justify leading-relaxed">
-                Certified further that the above named-person is belonging to an indigent family and highly recommended to avail any privileges.
-              </p>
-
-              {certificate.purpose && (
-                <p className="text-justify leading-relaxed">
-                  This Certification is hereby issued upon the personal request of the above named-person for {certificate.purpose}.
-                </p>
-              )}
-
-              <p className="leading-relaxed">
-                Issued this{" "}
-                <span className="font-semibold">
-                  {format(new Date(certificate.issued_date), "do")}
-                </span>{" "}
-                day of{" "}
-                <span className="font-semibold">
-                  {format(new Date(certificate.issued_date), "MMMM yyyy")}
-                </span>{" "}
-                at Barangay Poblacion, Lagangilang, Abra.
-              </p>
-            </div>
-
-            {/* Affiant Section */}
-            <div className="mt-8">
-              <p className="font-bold">
-                {certificate.residents
-                  ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
-                  : "N/A"}
-              </p>
-              <p className="text-xs">Affiant</p>
-            </div>
-
-            {/* Footer Note */}
-            <div className="mt-8">
-              <p className="text-xs italic">Not valid without dry seal</p>
-            </div>
-
-            {/* Signature Section */}
-            <div className="mt-12 flex justify-center">
-              <div className="text-center">
-                <p className="font-bold">
-                  Hon. {certificate.issued_by || "ARMANDO D. DEVELOS"}
-                </p>
-                <p className="text-xs">Punong Barangay</p>
-              </div>
+              {certificate.certificate_type === 'indigency' && renderIndigencyContent()}
+              {certificate.certificate_type === 'residency' && renderResidencyContent()}
+              {certificate.certificate_type === 'business_permit' && renderBusinessPermitContent()}
             </div>
 
             {/* Certificate Number */}

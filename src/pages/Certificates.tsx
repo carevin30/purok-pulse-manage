@@ -12,7 +12,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Search, Download } from "lucide-react";
+import { FileText, Search, Download, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import GenerateCertificateDialog from "@/components/certificates/GenerateCertificateDialog";
 import ViewCertificateDialog from "@/components/certificates/ViewCertificateDialog";
 import { format } from "date-fns";
@@ -98,6 +109,27 @@ export default function Certificates() {
         {status}
       </Badge>
     );
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase
+      .from("certificates")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete certificate",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Certificate deleted successfully",
+      });
+      loadCertificates();
+    }
   };
 
   const handleDirectDownload = async (cert: Certificate) => {
@@ -299,6 +331,27 @@ export default function Certificates() {
                       >
                         <Download className="h-4 w-4" />
                       </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Certificate</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this certificate? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(cert.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </TableCell>
                 </TableRow>
