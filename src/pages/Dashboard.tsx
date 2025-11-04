@@ -107,149 +107,230 @@ export default function Dashboard() {
     }
   };
 
-  return (
-    <div className="space-y-8">
-      {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Residents"
-          value={isLoading ? "..." : totalResidents.toString()}
-          icon={Users}
-          trend={isLoading ? "" : `Active residents`}
-        />
-        <StatCard
-          title="Households"
-          value={isLoading ? "..." : totalHouseholds.toString()}
-          icon={Home}
-          trend={isLoading ? "" : `Registered households`}
-        />
-        <StatCard
-          title="Ongoing Activities"
-          value="8"
-          icon={Calendar}
-          variant="accent"
-        />
-        <StatCard
-          title="Reports Submitted"
-          value="23"
-          icon={ClipboardList}
-          trend="15 pending"
-        />
-      </div>
+  const growthRate = totalResidents > 0 ? "+5.2%" : "0%";
 
-      {/* Charts and Notifications */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Age Distribution Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              Age Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                Loading...
+  return (
+    <div className="space-y-6">
+      {/* Hero Section - Total Residents */}
+      <Card className="bg-gradient-to-br from-primary/90 to-primary border-none shadow-strong">
+        <CardContent className="p-8">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-primary-foreground/80">Total Population</p>
+              <div className="flex items-baseline gap-3">
+                <h1 className="text-5xl font-bold text-primary-foreground">
+                  {isLoading ? "..." : totalResidents.toLocaleString()}
+                </h1>
+                <span className="text-sm font-medium text-primary-foreground/80">{growthRate}</span>
               </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={ageData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="age" 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Bar 
-                  dataKey="population" 
-                  fill="hsl(var(--primary))" 
-                  radius={[8, 8, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-            )}
+            </div>
+            <div className="flex gap-3">
+              <button className="px-6 py-2.5 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent/90 transition-colors shadow-md">
+                Add Resident
+              </button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Stats Row */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Households Card */}
+        <Card className="hover:shadow-medium transition-all">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-accent/10">
+                <Home className="h-6 w-6 text-accent" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-muted-foreground">Households</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <p className="text-2xl font-bold">{isLoading ? "..." : totalHouseholds.toLocaleString()}</p>
+                  <span className="text-xs font-medium text-accent">+2.1%</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">vs. Last Month</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Gender Distribution Pie Chart */}
-        <Card>
+        {/* Activities Card */}
+        <Card className="hover:shadow-medium transition-all">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-primary/10">
+                <Calendar className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-muted-foreground">Activities</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <p className="text-2xl font-bold">8</p>
+                  <span className="text-xs font-medium text-primary">Ongoing</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Reports Card */}
+        <Card className="hover:shadow-medium transition-all">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-destructive/10">
+                <ClipboardList className="h-6 w-6 text-destructive" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-muted-foreground">Reports</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <p className="text-2xl font-bold">23</p>
+                  <span className="text-xs font-medium text-destructive">15 Pending</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Age Distribution Chart - Takes 2 columns */}
+        <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              Gender Distribution
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                Age Distribution
+              </CardTitle>
+              <div className="flex gap-1 text-xs">
+                <button className="px-3 py-1 bg-primary text-primary-foreground rounded-md font-medium">Weekly</button>
+                <button className="px-3 py-1 hover:bg-muted rounded-md">Monthly</button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+              <div className="flex items-center justify-center h-[280px] text-muted-foreground">
                 Loading...
               </div>
-            ) : genderData.every((item) => item.value === 0) ? (
-              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                No data available
-              </div>
             ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={genderData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {genderData.map((entry) => (
-                      <Cell key={`cell-${entry.name}`} fill={COLORS[entry.name as keyof typeof COLORS]} />
-                    ))}
-                  </Pie>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={ageData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis 
+                    dataKey="age" 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <Tooltip 
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",
                       borderRadius: "var(--radius)",
                     }}
+                    cursor={{ fill: "hsl(var(--accent) / 0.1)" }}
                   />
-                  <Legend />
-                </PieChart>
+                  <Bar 
+                    dataKey="population" 
+                    fill="hsl(var(--primary))" 
+                    radius={[8, 8, 0, 0]}
+                  />
+                </BarChart>
               </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Gender Distribution - Compact Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Gender Split</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-[280px] text-muted-foreground">
+                Loading...
+              </div>
+            ) : genderData.every((item) => item.value === 0) ? (
+              <div className="flex items-center justify-center h-[280px] text-muted-foreground">
+                No data
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <ResponsiveContainer width="100%" height={180}>
+                  <PieChart>
+                    <Pie
+                      data={genderData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={70}
+                      fill="#8884d8"
+                      dataKey="value"
+                      paddingAngle={2}
+                    >
+                      {genderData.map((entry) => (
+                        <Cell key={`cell-${entry.name}`} fill={COLORS[entry.name as keyof typeof COLORS]} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="space-y-2">
+                  {genderData.map((item) => (
+                    <div key={item.name} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: COLORS[item.name as keyof typeof COLORS] }}
+                        />
+                        <span className="text-sm font-medium">{item.name}</span>
+                      </div>
+                      <span className="text-sm font-bold">
+                        {((item.value / totalResidents) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Notifications */}
+      {/* Recent Updates */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-accent" />
-            Recent Updates
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Bell className="h-5 w-5 text-accent" />
+              Recent Updates
+            </CardTitle>
+            <button className="text-sm font-medium text-primary hover:underline">See All</button>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {notifications.map((notif) => (
               <div
                 key={notif.id}
-                className="rounded-lg border border-border bg-secondary/50 p-4 transition-all hover:bg-secondary"
+                className="flex items-start gap-4 p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
               >
-                <p className="text-xs font-semibold text-primary">{notif.type}</p>
-                <p className="mt-1 text-sm text-foreground">{notif.message}</p>
-                <p className="mt-2 text-xs text-muted-foreground">{notif.time}</p>
+                <div className="p-2 rounded-lg bg-accent/10">
+                  <Bell className="h-4 w-4 text-accent" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold">{notif.type}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{notif.message}</p>
+                </div>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">{notif.time}</span>
               </div>
             ))}
           </div>
