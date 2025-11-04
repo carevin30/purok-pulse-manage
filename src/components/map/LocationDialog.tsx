@@ -63,6 +63,13 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
       .setLngLat([lng, lat])
       .addTo(map.current);
 
+    // Resize map after load to ensure proper rendering
+    map.current.on('load', () => {
+      setTimeout(() => {
+        map.current?.resize();
+      }, 100);
+    });
+
     return () => {
       marker.current?.remove();
       map.current?.remove();
