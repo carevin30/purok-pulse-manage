@@ -227,6 +227,8 @@ export type Database = {
           head_of_household_id: string | null
           house_number: string
           id: string
+          latitude: number | null
+          longitude: number | null
           purok: string | null
           street_address: string | null
           updated_at: string
@@ -238,6 +240,8 @@ export type Database = {
           head_of_household_id?: string | null
           house_number: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           purok?: string | null
           street_address?: string | null
           updated_at?: string
@@ -249,6 +253,8 @@ export type Database = {
           head_of_household_id?: string | null
           house_number?: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           purok?: string | null
           street_address?: string | null
           updated_at?: string

@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Search, Users, Zap, Droplet, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Users, Zap, Droplet, Pencil, Trash2, MapPin } from "lucide-react";
 import AddHouseholdDialog from "@/components/AddHouseholdDialog";
 import EditHouseholdDialog from "@/components/EditHouseholdDialog";
+import LocationDialog from "@/components/map/LocationDialog";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
@@ -34,6 +35,8 @@ interface Household {
   street_address: string | null;
   has_electricity: boolean;
   has_water: boolean;
+  latitude: number | null;
+  longitude: number | null;
   head_of_household_id: string | null;
   created_at: string;
   updated_at: string;
@@ -53,6 +56,7 @@ export default function Households() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<Household | null>(null);
   const [deletingHousehold, setDeletingHousehold] = useState<Household | null>(null);
+  const [viewingLocation, setViewingLocation] = useState<Household | null>(null);
   const { toast } = useToast();
 
   const fetchHouseholds = async () => {
@@ -201,6 +205,7 @@ export default function Households() {
                     <TableHead>Address</TableHead>
                     <TableHead>Residents</TableHead>
                     <TableHead>Utilities</TableHead>
+                    <TableHead>Location</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -237,6 +242,16 @@ export default function Households() {
                           )}
                         </div>
                       </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setViewingLocation(household)}
+                          disabled={!household.latitude || !household.longitude}
+                        >
+                          <MapPin className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
@@ -270,6 +285,17 @@ export default function Households() {
           open={!!editingHousehold}
           onOpenChange={(open) => !open && setEditingHousehold(null)}
           onSuccess={fetchHouseholds}
+        />
+      )}
+
+      {viewingLocation && viewingLocation.latitude && viewingLocation.longitude && (
+        <LocationDialog
+          open={!!viewingLocation}
+          onOpenChange={(open) => !open && setViewingLocation(null)}
+          lat={viewingLocation.latitude}
+          lng={viewingLocation.longitude}
+          title="Household Location"
+          address={`House ${viewingLocation.house_number}${viewingLocation.purok ? `, ${viewingLocation.purok}` : ''}${viewingLocation.street_address ? `, ${viewingLocation.street_address}` : ''}`}
         />
       )}
 

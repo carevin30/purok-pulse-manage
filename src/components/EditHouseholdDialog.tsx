@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
+import MapPicker from "@/components/map/MapPicker";
 
 interface EditHouseholdDialogProps {
   household: any;
@@ -38,6 +39,8 @@ export default function EditHouseholdDialog({
   const [streetAddress, setStreetAddress] = useState("");
   const [hasElectricity, setHasElectricity] = useState(false);
   const [hasWater, setHasWater] = useState(false);
+  const [latitude, setLatitude] = useState<number>(17.65);
+  const [longitude, setLongitude] = useState<number>(120.85);
   const [selectedResidents, setSelectedResidents] = useState<string[]>([]);
   const [availableResidents, setAvailableResidents] = useState<Resident[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,6 +53,8 @@ export default function EditHouseholdDialog({
       setStreetAddress(household.street_address || "");
       setHasElectricity(household.has_electricity || false);
       setHasWater(household.has_water || false);
+      setLatitude(household.latitude || 17.65);
+      setLongitude(household.longitude || 120.85);
       fetchResidents();
     }
   }, [household, open]);
@@ -103,6 +108,8 @@ export default function EditHouseholdDialog({
           street_address: streetAddress.trim() || null,
           has_electricity: hasElectricity,
           has_water: hasWater,
+          latitude,
+          longitude,
         })
         .eq("id", household.id);
 
@@ -215,6 +222,18 @@ export default function EditHouseholdDialog({
                 value={streetAddress}
                 onChange={(e) => setStreetAddress(e.target.value)}
                 placeholder="e.g., Sampaguita Street"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Location on Map</Label>
+              <MapPicker
+                initialLat={latitude}
+                initialLng={longitude}
+                onLocationSelect={(lat, lng) => {
+                  setLatitude(lat);
+                  setLongitude(lng);
+                }}
               />
             </div>
 

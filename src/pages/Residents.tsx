@@ -3,11 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, FileText, Pencil, Trash2 } from "lucide-react";
+import { Search, FileText, Pencil, Trash2, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AddResidentDialog from "@/components/AddResidentDialog";
 import EditResidentDialog from "@/components/EditResidentDialog";
+import LocationDialog from "@/components/map/LocationDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,10 +28,20 @@ interface Resident {
   date_of_birth: string;
   gender: string;
   house_number: string | null;
+  household_id: string | null;
   status: string;
   is_senior_citizen: boolean;
   is_pwd: boolean;
   is_indigenous: boolean;
+}
+
+interface HouseholdLocation {
+  id: string;
+  house_number: string;
+  purok: string | null;
+  street_address: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export default function Residents() {
@@ -39,6 +50,7 @@ export default function Residents() {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingResident, setEditingResident] = useState<Resident | null>(null);
   const [deletingResident, setDeletingResident] = useState<Resident | null>(null);
+  const [viewingLocation, setViewingLocation] = useState<HouseholdLocation | null>(null);
   const { toast } = useToast();
 
   const fetchResidents = async () => {
@@ -90,6 +102,44 @@ export default function Residents() {
     return fullName.includes(searchQuery.toLowerCase()) || 
            resident.house_number?.toLowerCase().includes(searchQuery.toLowerCase());
   });
+
+  const handleViewLocation = async (resident: Resident) => {
+    if (!resident.household_id) {
+      toast({
+        title: "No Household",
+        description: "This resident is not assigned to any household",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("households")
+        .select("id, house_number, purok, street_address, latitude, longitude")
+        .eq("id", resident.household_id)
+        .single();
+
+      if (error) throw error;
+
+      if (!data.latitude || !data.longitude) {
+        toast({
+          title: "No Location",
+          description: "This household doesn't have a location set",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setViewingLocation(data);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fetch household location",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleDelete = async () => {
     if (!deletingResident) return;
@@ -163,6 +213,7 @@ export default function Residents() {
                     <th className="pb-3 text-left text-sm font-medium text-muted-foreground">House Number</th>
                     <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Status</th>
                     <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Special Status</th>
+                    <th className="pb-3 text-left text-sm font-medium text-muted-foreground">Location</th>
                     <th className="pb-3 text-right text-sm font-medium text-muted-foreground">Actions</th>
                   </tr>
                 </thead>
@@ -193,6 +244,16 @@ export default function Residents() {
                           ) : (
                             <span className="text-sm text-muted-foreground">—</span>
                           )}
+                        </td>
+                        <td className="py-4">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewLocation(resident)}
+                            disabled={!resident.household_id}
+                          >
+                            <MapPin className="h-4 w-4" />
+                          </Button>
                         </td>
                         <td className="py-4 text-right">
                           <div className="flex justify-end gap-2">
@@ -228,6 +289,17 @@ export default function Residents() {
           open={!!editingResident}
           onOpenChange={(open) => !open && setEditingResident(null)}
           onSuccess={fetchResidents}
+        />
+      )}
+
+      {viewingLocation && viewingLocation.latitude && viewingLocation.longitude && (
+        <LocationDialog
+          open={!!viewingLocation}
+          onOpenChange={(open) => !open && setViewingLocation(null)}
+          lat={viewingLocation.latitude}
+          lng={viewingLocation.longitude}
+          title="Resident Household Location"
+          address={`House ${viewingLocation.house_number}${viewingLocation.purok ? `, ${viewingLocation.purok}` : ''}${viewingLocation.street_address ? `, ${viewingLocation.street_address}` : ''}`}
         />
       )}
 
