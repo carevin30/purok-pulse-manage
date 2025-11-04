@@ -6,9 +6,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Eye } from "lucide-react";
+import { Eye, Download } from "lucide-react";
 import { format } from "date-fns";
 import barangayLogo from "@/assets/barangay-logo.png";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { useRef } from "react";
 
 type Certificate = {
   id: string;
@@ -32,11 +35,53 @@ type ViewCertificateDialogProps = {
 export default function ViewCertificateDialog({
   certificate,
 }: ViewCertificateDialogProps) {
+  const certificateRef = useRef<HTMLDivElement>(null);
+
   const getCertificateTypeLabel = (type: string) => {
     return type
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!certificateRef.current) return;
+
+    try {
+      const canvas = await html2canvas(certificateRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        imgX,
+        imgY,
+        imgWidth * ratio,
+        imgHeight * ratio
+      );
+      pdf.save(
+        `${getCertificateTypeLabel(certificate.certificate_type)}_${certificate.certificate_number}.pdf`
+      );
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
   };
 
   return (
@@ -46,24 +91,28 @@ export default function ViewCertificateDialog({
           <Eye className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Certificate Preview</DialogTitle>
+          <Button onClick={handleDownloadPDF} size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Download PDF
+          </Button>
         </DialogHeader>
 
-        <div className="border-2 border-foreground rounded-lg p-8 bg-background">
+        <div ref={certificateRef} className="border-2 border-foreground rounded-lg p-8 bg-white">
           {/* Header with Logo */}
           <div className="flex items-start gap-4 mb-6">
             <img 
               src={barangayLogo} 
               alt="Barangay Logo" 
-              className="w-20 h-20 object-contain"
+              className="w-32 h-32 object-contain"
             />
             <div className="flex-1 text-center">
               <p className="text-sm font-semibold">Republic of the Philippines</p>
-              <p className="text-sm font-semibold">Province of Cotabato</p>
-              <p className="text-sm font-semibold">Municipality of Matalam</p>
-              <p className="text-sm font-semibold">Barangay Sarayan</p>
+              <p className="text-sm font-semibold">Province of Abra</p>
+              <p className="text-sm font-semibold">Municipality of Lagangilang</p>
+              <p className="text-sm font-semibold">Barangay Poblacion</p>
               <p className="text-xs font-bold mt-1">OFFICE OF THE PUNONG BARANGAY</p>
             </div>
           </div>
@@ -87,7 +136,7 @@ export default function ViewCertificateDialog({
                     ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
                     : "N/A"}
                 </span>
-                , years old, single, a bona fide resident of Purok 7, Barangay Sarayan, Matalam, Cotabato.
+                , years old, single, a bona fide resident of Purok 7, Barangay Poblacion, Lagangilang, Abra.
               </p>
 
               <p className="text-justify leading-relaxed">
@@ -109,7 +158,7 @@ export default function ViewCertificateDialog({
                 <span className="font-semibold">
                   {format(new Date(certificate.issued_date), "MMMM yyyy")}
                 </span>{" "}
-                at Barangay Sarayan, Matalam, Cotabato.
+                at Barangay Poblacion, Lagangilang, Abra.
               </p>
             </div>
 

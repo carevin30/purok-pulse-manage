@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,10 +12,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Search, Download, Eye } from "lucide-react";
+import { FileText, Search, Download } from "lucide-react";
 import GenerateCertificateDialog from "@/components/certificates/GenerateCertificateDialog";
 import ViewCertificateDialog from "@/components/certificates/ViewCertificateDialog";
 import { format } from "date-fns";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import barangayLogo from "@/assets/barangay-logo.png";
 
 type Certificate = {
   id: string;
@@ -38,7 +41,9 @@ export default function Certificates() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [downloadingCert, setDownloadingCert] = useState<string | null>(null);
   const { toast } = useToast();
+  const hiddenCertRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadCertificates();
@@ -93,6 +98,114 @@ export default function Certificates() {
         {status}
       </Badge>
     );
+  };
+
+  const handleDirectDownload = async (cert: Certificate) => {
+    setDownloadingCert(cert.id);
+    
+    const tempDiv = document.createElement("div");
+    tempDiv.style.position = "absolute";
+    tempDiv.style.left = "-9999px";
+    tempDiv.style.width = "800px";
+    tempDiv.innerHTML = `
+      <div style="border: 2px solid #000; border-radius: 8px; padding: 40px; background: white; font-family: Arial, sans-serif;">
+        <div style="display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-start;">
+          <img src="${barangayLogo}" alt="Logo" style="width: 128px; height: 128px; object-fit: contain;" />
+          <div style="flex: 1; text-align: center;">
+            <p style="font-size: 14px; font-weight: 600; margin: 4px 0;">Republic of the Philippines</p>
+            <p style="font-size: 14px; font-weight: 600; margin: 4px 0;">Province of Abra</p>
+            <p style="font-size: 14px; font-weight: 600; margin: 4px 0;">Municipality of Lagangilang</p>
+            <p style="font-size: 14px; font-weight: 600; margin: 4px 0;">Barangay Poblacion</p>
+            <p style="font-size: 12px; font-weight: bold; margin-top: 8px;">OFFICE OF THE PUNONG BARANGAY</p>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h3 style="font-size: 24px; font-weight: bold; text-transform: uppercase; color: #16a34a; margin: 0;">
+            ${getCertificateTypeLabel(cert.certificate_type)}
+          </h3>
+        </div>
+        
+        <div style="font-size: 14px; line-height: 1.8;">
+          <p style="font-weight: 600; margin-bottom: 16px;">TO WHOM IT MAY CONCERN:</p>
+          
+          <p style="text-align: justify; margin-bottom: 16px;">
+            This is to CERTIFY that <strong>${cert.residents ? `${cert.residents.first_name.toUpperCase()} ${cert.residents.last_name.toUpperCase()}` : "N/A"}</strong>, years old, single, a bona fide resident of Purok 7, Barangay Poblacion, Lagangilang, Abra.
+          </p>
+          
+          <p style="text-align: justify; margin-bottom: 16px;">
+            Certified further that the above named-person is belonging to an indigent family and highly recommended to avail any privileges.
+          </p>
+          
+          ${cert.purpose ? `<p style="text-align: justify; margin-bottom: 16px;">This Certification is hereby issued upon the personal request of the above named-person for ${cert.purpose}.</p>` : ""}
+          
+          <p style="margin-bottom: 32px;">
+            Issued this <strong>${format(new Date(cert.issued_date), "do")}</strong> day of <strong>${format(new Date(cert.issued_date), "MMMM yyyy")}</strong> at Barangay Poblacion, Lagangilang, Abra.
+          </p>
+          
+          <div style="margin-top: 32px;">
+            <p style="font-weight: bold;">${cert.residents ? `${cert.residents.first_name.toUpperCase()} ${cert.residents.last_name.toUpperCase()}` : "N/A"}</p>
+            <p style="font-size: 12px;">Affiant</p>
+          </div>
+          
+          <div style="margin-top: 32px;">
+            <p style="font-size: 12px; font-style: italic;">Not valid without dry seal</p>
+          </div>
+          
+          <div style="margin-top: 48px; text-align: center;">
+            <p style="font-weight: bold;">Hon. ${cert.issued_by || "ARMANDO D. DEVELOS"}</p>
+            <p style="font-size: 12px;">Punong Barangay</p>
+          </div>
+          
+          <div style="margin-top: 24px; text-align: center;">
+            <p style="font-size: 12px; color: #666;">Certificate No: ${cert.certificate_number}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(tempDiv);
+    
+    try {
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+      });
+      
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+      
+      pdf.addImage(imgData, "PNG", imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`${getCertificateTypeLabel(cert.certificate_type)}_${cert.certificate_number}.pdf`);
+      
+      toast({
+        title: "Success",
+        description: "Certificate downloaded successfully",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to download certificate",
+        variant: "destructive",
+      });
+    } finally {
+      document.body.removeChild(tempDiv);
+      setDownloadingCert(null);
+    }
   };
 
   return (
@@ -178,7 +291,12 @@ export default function Certificates() {
                   <TableCell>
                     <div className="flex gap-2">
                       <ViewCertificateDialog certificate={cert} />
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleDirectDownload(cert)}
+                        disabled={downloadingCert === cert.id}
+                      >
                         <Download className="h-4 w-4" />
                       </Button>
                     </div>
