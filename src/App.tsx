@@ -12,7 +12,7 @@ import Officials from "./pages/Officials";
 import Activities from "./pages/Activities";
 import Ordinances from "./pages/Ordinances";
 import Reports from "./pages/Reports";
-import Placeholder from "./pages/Placeholder";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 
@@ -41,7 +41,7 @@ const App: React.FC = () => {
               <Route path="ordinances" element={<Ordinances />} />
               <Route path="activities" element={<Activities />} />
               <Route path="reports" element={<Reports />} />
-              <Route path="settings" element={<Placeholder />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
