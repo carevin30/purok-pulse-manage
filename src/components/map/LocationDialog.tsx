@@ -33,55 +33,99 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
-  // Initialize map only once
+  // Initialize map when dialog opens
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    if (!open || !mapContainer.current || map.current) return;
 
-    console.log('Initializing map...');
+    console.log('Dialog opened, initializing map...');
     
+    // Wait for dialog animation to complete
+    const initTimer = setTimeout(() => {
+      if (!mapContainer.current || map.current) return;
+
+      try {
+        // Check if container has dimensions
+        const rect = mapContainer.current.getBoundingClientRect();
+        console.log('Container dimensions:', rect.width, rect.height);
+        
+        if (rect.width === 0 || rect.height === 0) {
+          console.warn('Container has no dimensions');
+          setMapError('Container not ready');
+          return;
+        }
+
+        console.log('Creating map instance...');
+        
+        // Initialize map
+        map.current = new maplibregl.Map({
+          container: mapContainer.current,
+          style: 'https://tiles.openfreemap.org/styles/liberty',
+          center: [lng, lat],
+          zoom: 16,
+        });
+
+        // Add navigation controls
+        map.current.addControl(
+          new maplibregl.NavigationControl({
+            visualizePitch: false,
+          }),
+          'top-right'
+        );
+
+        // Create marker
+        marker.current = new maplibregl.Marker({
+          color: '#5D866C',
+        })
+          .setLngLat([lng, lat])
+          .addTo(map.current);
+
+        // Mark as ready when loaded
+        map.current.on('load', () => {
+          console.log('Map loaded successfully');
+          setMapReady(true);
+          setMapError(null);
+          map.current?.resize();
+        });
+
+        map.current.on('error', (e) => {
+          console.error('Map error:', e);
+          setMapError('Failed to load map');
+        });
+
+      } catch (error) {
+        console.error('Error initializing map:', error);
+        setMapError('Failed to initialize map');
+      }
+    }, 500);
+
+    return () => clearTimeout(initTimer);
+  }, [open, lat, lng]);
+
+  // Update map position when coordinates change (if already initialized)
+  useEffect(() => {
+    if (!mapReady || !map.current || !marker.current) return;
+
+    console.log('Updating map position:', lat, lng);
+
     try {
-      // Initialize map
-      map.current = new maplibregl.Map({
-        container: mapContainer.current,
-        style: 'https://tiles.openfreemap.org/styles/liberty',
+      // Update center and marker position
+      map.current.flyTo({
         center: [lng, lat],
         zoom: 16,
+        duration: 1000,
       });
-
-      // Add navigation controls
-      map.current.addControl(
-        new maplibregl.NavigationControl({
-          visualizePitch: false,
-        }),
-        'top-right'
-      );
-
-      // Create marker
-      marker.current = new maplibregl.Marker({
-        color: '#5D866C',
-      })
-        .setLngLat([lng, lat])
-        .addTo(map.current);
-
-      // Mark as ready when loaded
-      map.current.on('load', () => {
-        console.log('Map loaded successfully');
-        setMapReady(true);
-        map.current?.resize();
-      });
-
-      map.current.on('error', (e) => {
-        console.error('Map error:', e);
-        setMapError('Failed to load map');
-      });
-
+      
+      marker.current.setLngLat([lng, lat]);
+      
     } catch (error) {
-      console.error('Error initializing map:', error);
-      setMapError('Failed to initialize map');
+      console.error('Error updating map:', error);
     }
+  }, [lat, lng, mapReady]);
 
-    // Cleanup only on unmount
-    return () => {
+  // Cleanup when dialog closes
+  useEffect(() => {
+    if (!open && map.current) {
+      console.log('Dialog closed, cleaning up map...');
       if (marker.current) {
         marker.current.remove();
         marker.current = null;
@@ -91,50 +135,9 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
         map.current = null;
       }
       setMapReady(false);
-    };
-  }, []); // Only run once
-
-  // Update map when dialog opens or coordinates change
-  useEffect(() => {
-    if (!open || !map.current || !marker.current) return;
-
-    console.log('Updating map position:', lat, lng);
-
-    // Wait for dialog animation to complete
-    const timeoutId = setTimeout(() => {
-      if (!map.current || !marker.current) return;
-
-      try {
-        // Check if container has dimensions
-        const container = mapContainer.current;
-        if (container) {
-          const rect = container.getBoundingClientRect();
-          console.log('Container dimensions:', rect.width, rect.height);
-          
-          if (rect.width === 0 || rect.height === 0) {
-            console.warn('Container has no dimensions yet');
-          }
-        }
-
-        // Force resize to ensure proper rendering
-        map.current.resize();
-        
-        // Update center and marker position
-        map.current.flyTo({
-          center: [lng, lat],
-          zoom: 16,
-          duration: 1000,
-        });
-        
-        marker.current.setLngLat([lng, lat]);
-        
-      } catch (error) {
-        console.error('Error updating map:', error);
-      }
-    }, 400); // Wait for dialog animation
-
-    return () => clearTimeout(timeoutId);
-  }, [open, lat, lng]);
+      setMapError(null);
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
