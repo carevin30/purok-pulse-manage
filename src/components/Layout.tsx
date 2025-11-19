@@ -80,7 +80,7 @@ export default function Layout() {
             <Home className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-foreground">Barangay MS</h1>
+            <h1 className="text-lg font-bold text-foreground">BDHUB</h1>
             <p className="text-xs text-muted-foreground">Management System</p>
           </div>
         </div>
