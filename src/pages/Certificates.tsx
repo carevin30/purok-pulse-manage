@@ -143,57 +143,51 @@ export default function Certificates() {
     tempDiv.style.left = "-9999px";
     tempDiv.style.width = "800px";
     tempDiv.innerHTML = `
-      <div style="border: 2px solid #000; border-radius: 8px; padding: 40px; background: white; font-family: Arial, sans-serif;">
-        <div style="display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-start;">
-          <img src="${barangayLogo}" alt="Logo" style="width: 128px; height: 128px; object-fit: contain;" />
-          <div style="flex: 1; text-align: center;">
-            <p style="font-size: 14px; font-weight: 600; margin: 4px 0;">Republic of the Philippines</p>
-            <p style="font-size: 14px; font-weight: 600; margin: 4px 0;">Province of Abra</p>
-            <p style="font-size: 14px; font-weight: 600; margin: 4px 0;">Municipality of Lagangilang</p>
-            <p style="font-size: 14px; font-weight: 600; margin: 4px 0;">Barangay Poblacion</p>
-            <p style="font-size: 12px; font-weight: bold; margin-top: 8px;">OFFICE OF THE PUNONG BARANGAY</p>
+      <div style="padding: 60px 80px; background: white; font-family: 'Times New Roman', serif;">
+        <div style="display: flex; gap: 20px; margin-bottom: 32px; align-items: flex-start;">
+          <img src="${barangayLogo}" alt="Logo" style="width: 100px; height: 100px; object-fit: contain;" />
+          <div style="flex: 1; text-align: center; padding-top: 10px;">
+            <p style="font-size: 14px; margin: 2px 0;">Republic of the Philippines</p>
+            <p style="font-size: 14px; margin: 2px 0;">Province of Cotabato</p>
+            <p style="font-size: 14px; margin: 2px 0;">Municipality of Matalam</p>
+            <p style="font-size: 14px; margin: 2px 0;">Barangay Sarayan</p>
+            <p style="font-size: 13px; font-weight: bold; margin-top: 8px; letter-spacing: 1px;">OFFICE OF THE PUNONG BARANGAY</p>
           </div>
         </div>
         
-        <div style="text-align: center; margin-bottom: 32px;">
-          <h3 style="font-size: 24px; font-weight: bold; text-transform: uppercase; color: #16a34a; margin: 0;">
-            ${getCertificateTypeLabel(cert.certificate_type)}
+        <div style="text-align: center; margin-bottom: 40px; margin-top: 32px;">
+          <h3 style="font-size: 28px; font-weight: bold; text-transform: uppercase; color: #16a34a; margin: 0; letter-spacing: 2px;">
+            CERTIFICATE OF INDIGENCY
           </h3>
         </div>
         
-        <div style="font-size: 14px; line-height: 1.8;">
-          <p style="font-weight: 600; margin-bottom: 16px;">TO WHOM IT MAY CONCERN:</p>
+        <div style="font-size: 15px; line-height: 2;">
+          <p style="margin-bottom: 24px;">TO WHOM IT MAY CONCERN:</p>
           
-          <p style="text-align: justify; margin-bottom: 16px;">
-            This is to CERTIFY that <strong>${cert.residents ? `${cert.residents.first_name.toUpperCase()} ${cert.residents.last_name.toUpperCase()}` : "N/A"}</strong>, years old, single, a bona fide resident of Purok 7, Barangay Poblacion, Lagangilang, Abra.
+          <p style="text-align: justify; margin-bottom: 20px; text-indent: 40px;">
+            This is to CERTIFY that <strong>${cert.residents ? `${cert.residents.first_name.toUpperCase()} ${cert.residents.last_name.toUpperCase()}` : "N/A"}</strong>, 29 years old, single, a bona fide resident of Purok 7, Barangay Sarayan, Matalam, Cotabato.
           </p>
           
-          <p style="text-align: justify; margin-bottom: 16px;">
+          <p style="text-align: justify; margin-bottom: 20px; text-indent: 40px;">
             Certified further that the above named-person is belonging to an indigent family and highly recommended to avail any privileges.
           </p>
           
-          ${cert.purpose ? `<p style="text-align: justify; margin-bottom: 16px;">This Certification is hereby issued upon the personal request of the above named-person for ${cert.purpose}.</p>` : ""}
+          ${cert.purpose ? `<p style="text-align: justify; margin-bottom: 20px; text-indent: 40px;">This Certification is hereby issued upon the personal request of the above named-person for ${cert.purpose}.</p>` : ""}
           
-          <p style="margin-bottom: 32px;">
-            Issued this <strong>${format(new Date(cert.issued_date), "do")}</strong> day of <strong>${format(new Date(cert.issued_date), "MMMM yyyy")}</strong> at Barangay Poblacion, Lagangilang, Abra.
+          <p style="margin-bottom: 48px; text-indent: 40px;">
+            Issued this <strong>${format(new Date(cert.issued_date), "do")}</strong> day of <strong>${format(new Date(cert.issued_date), "MMMM yyyy")}</strong> at Barangay Sarayan, Matalam, Cotabato.
           </p>
           
-          <div style="margin-top: 32px;">
-            <p style="font-weight: bold;">${cert.residents ? `${cert.residents.first_name.toUpperCase()} ${cert.residents.last_name.toUpperCase()}` : "N/A"}</p>
-            <p style="font-size: 12px;">Affiant</p>
+          <div style="margin-top: 48px; margin-bottom: 80px;">
+            <p style="font-weight: bold; text-decoration: underline;">${cert.residents ? `${cert.residents.first_name.toUpperCase()} ${cert.residents.last_name.toUpperCase()}` : "N/A"}</p>
+            <p style="font-size: 14px;">Affiant</p>
           </div>
           
-          <div style="margin-top: 32px;">
-            <p style="font-size: 12px; font-style: italic;">Not valid without dry seal</p>
-          </div>
+          <p style="font-size: 13px; margin-bottom: 60px;">Not valid without dry seal</p>
           
-          <div style="margin-top: 48px; text-align: center;">
-            <p style="font-weight: bold;">Hon. ${cert.issued_by || "ARMANDO D. DEVELOS"}</p>
-            <p style="font-size: 12px;">Punong Barangay</p>
-          </div>
-          
-          <div style="margin-top: 24px; text-align: center;">
-            <p style="font-size: 12px; color: #666;">Certificate No: ${cert.certificate_number}</p>
+          <div style="text-align: center; margin-top: 60px;">
+            <p style="font-weight: bold; font-size: 16px;">Hon. ${cert.issued_by || "ARMANDO D. DEVELOS"}</p>
+            <p style="font-size: 14px;">Punong Barangay</p>
           </div>
         </div>
       </div>
