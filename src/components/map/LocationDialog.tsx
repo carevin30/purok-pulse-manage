@@ -2,12 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { MapPin } from 'lucide-react';
 
 interface LocationDialogProps {
@@ -106,15 +106,15 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
   }, [open, lat, lng]);
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-2xl">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
             View the location on OpenStreetMap
-          </SheetDescription>
-        </SheetHeader>
-        <div className="space-y-3 mt-4">
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
           {address && (
             <div className="flex items-start gap-2 text-sm">
               <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
@@ -130,8 +130,8 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
             <div ref={mapContainer} className="w-full h-full" />
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 };
 
