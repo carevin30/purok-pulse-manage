@@ -4,10 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Search, Users, Zap, Droplet, Pencil, Trash2, MapPin } from "lucide-react";
+import { Plus, Search, Users, Zap, Droplet, Pencil, Trash2, MapPin, ExternalLink } from "lucide-react";
 import AddHouseholdDialog from "@/components/AddHouseholdDialog";
 import EditHouseholdDialog from "@/components/EditHouseholdDialog";
-import LocationDialog from "@/components/map/LocationDialog";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
@@ -56,7 +55,6 @@ export default function Households() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<Household | null>(null);
   const [deletingHousehold, setDeletingHousehold] = useState<Household | null>(null);
-  const [viewingLocation, setViewingLocation] = useState<Household | null>(null);
   const { toast } = useToast();
 
   const fetchHouseholds = async () => {
@@ -246,10 +244,21 @@ export default function Households() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setViewingLocation(household)}
+                          onClick={() => {
+                            if (household.latitude && household.longitude) {
+                              const googleMapsUrl = `https://www.google.com/maps?q=${household.latitude},${household.longitude}&z=17&t=m`;
+                              window.open(googleMapsUrl, '_blank');
+                              toast({
+                                title: "Opening location",
+                                description: `House ${household.house_number}`,
+                              });
+                            }
+                          }}
                           disabled={!household.latitude || !household.longitude}
+                          title={household.latitude && household.longitude ? "Open in Google Maps" : "No location data"}
                         >
                           <MapPin className="h-4 w-4" />
+                          <ExternalLink className="h-3 w-3 ml-1" />
                         </Button>
                       </TableCell>
                       <TableCell className="text-right">
@@ -285,17 +294,6 @@ export default function Households() {
           open={!!editingHousehold}
           onOpenChange={(open) => !open && setEditingHousehold(null)}
           onSuccess={fetchHouseholds}
-        />
-      )}
-
-      {viewingLocation && viewingLocation.latitude && viewingLocation.longitude && (
-        <LocationDialog
-          open={!!viewingLocation}
-          onOpenChange={(open) => !open && setViewingLocation(null)}
-          lat={viewingLocation.latitude}
-          lng={viewingLocation.longitude}
-          title="Household Location"
-          address={`House ${viewingLocation.house_number}${viewingLocation.purok ? `, ${viewingLocation.purok}` : ''}${viewingLocation.street_address ? `, ${viewingLocation.street_address}` : ''}`}
         />
       )}
 
