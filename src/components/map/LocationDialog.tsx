@@ -35,7 +35,7 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
   useEffect(() => {
     if (!open || !mapContainer.current) return;
 
-    // Wait for dialog to be fully rendered
+    // Wait for dialog animation to complete
     const initTimer = setTimeout(() => {
       if (!mapContainer.current || map.current) return;
 
@@ -46,6 +46,14 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
           style: 'https://tiles.openfreemap.org/styles/liberty',
           center: [lng, lat],
           zoom: 16,
+        });
+
+        // Resize map once it's loaded to ensure proper rendering
+        map.current.on('load', () => {
+          if (map.current) {
+            map.current.resize();
+            map.current.setCenter([lng, lat]);
+          }
         });
 
         // Add navigation controls
@@ -66,7 +74,7 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
       } catch (error) {
         console.error('Error initializing map:', error);
       }
-    }, 100);
+    }, 300);
 
     // Cleanup when dialog closes
     return () => {
