@@ -59,7 +59,7 @@ export default function ViewCertificateDialog({
             ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
             : "N/A"}
         </span>
-        , years old, single, a bona fide resident of Purok 7, Barangay Poblacion, Lagangilang, Abra.
+        , 29 years old, single, a bona fide resident of Purok 7, Barangay Sarayan, Matalam, Cotabato.
       </p>
 
       <p className="text-justify leading-relaxed">
@@ -81,7 +81,7 @@ export default function ViewCertificateDialog({
         <span className="font-semibold">
           {format(new Date(certificate.issued_date), "MMMM yyyy")}
         </span>{" "}
-        at Barangay Poblacion, Lagangilang, Abra.
+        at Barangay Sarayan, Matalam, Cotabato.
       </p>
 
       <div className="mt-8">
@@ -300,15 +300,9 @@ export default function ViewCertificateDialog({
               />
               <div className="flex-1 text-center">
                 <p className="text-sm font-semibold">Republic of the Philippines</p>
-                <p className="text-sm font-semibold">
-                  {certificate.certificate_type === 'residency' ? 'Province of Cagayan' : 'Province of Abra'}
-                </p>
-                <p className="text-sm font-semibold">
-                  {certificate.certificate_type === 'residency' ? 'Municipality of Allacapan' : 'Municipality of Lagangilang'}
-                </p>
-                <p className="text-sm font-semibold">
-                  {certificate.certificate_type === 'residency' ? 'Barangay Cataratan' : 'Barangay Poblacion'}
-                </p>
+                <p className="text-sm font-semibold">Province of Cotabato</p>
+                <p className="text-sm font-semibold">Municipality of Matalam</p>
+                <p className="text-sm font-semibold">Barangay Sarayan</p>
                 <p className="text-xs font-bold mt-1">OFFICE OF THE PUNONG BARANGAY</p>
               </div>
             </div>
