@@ -162,14 +162,17 @@ export default function GenerateCertificateDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="indigency">
+                      <SelectItem value="certificate_of_indigency">
                         Certificate of Indigency
                       </SelectItem>
-                      <SelectItem value="residency">
+                      <SelectItem value="certificate_of_residency">
                         Certificate of Residency
                       </SelectItem>
                       <SelectItem value="business_permit">
                         Business Permit Clearance
+                      </SelectItem>
+                      <SelectItem value="barangay_clearance">
+                        Barangay Clearance
                       </SelectItem>
                     </SelectContent>
                   </Select>

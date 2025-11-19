@@ -320,8 +320,8 @@ export default function ViewCertificateDialog({
           <div className="space-y-6 text-sm">
             {/* Body Content Based on Type */}
             <div className="space-y-4">
-              {certificate.certificate_type === 'indigency' && renderIndigencyContent()}
-              {certificate.certificate_type === 'residency' && renderResidencyContent()}
+              {certificate.certificate_type === 'certificate_of_indigency' && renderIndigencyContent()}
+              {certificate.certificate_type === 'certificate_of_residency' && renderResidencyContent()}
               {certificate.certificate_type === 'business_permit' && renderBusinessPermitContent()}
             </div>
 
