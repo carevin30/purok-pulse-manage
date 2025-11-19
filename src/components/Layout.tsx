@@ -17,6 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import barangayLogo from "@/assets/barangay-logo.png";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -76,8 +77,8 @@ export default function Layout() {
       {/* Sidebar */}
       <aside className="w-64 border-r border-border bg-card">
         <div className="flex h-16 items-center gap-3 border-b border-border px-6">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-glow">
-            <Home className="h-5 w-5 text-primary-foreground" />
+          <div className="flex h-10 w-10 items-center justify-center">
+            <img src={barangayLogo} alt="Barangay Logo" className="h-10 w-10 object-contain" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-foreground">BDHUB</h1>
