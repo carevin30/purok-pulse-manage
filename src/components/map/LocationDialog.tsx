@@ -2,12 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { MapPin } from 'lucide-react';
 
 interface LocationDialogProps {
@@ -31,64 +31,78 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
   const map = useRef<maplibregl.Map | null>(null);
   const marker = useRef<maplibregl.Marker | null>(null);
 
-  // Initialize map once on mount - exactly like MapPicker
+  // Initialize map when dialog opens
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    if (!open || !mapContainer.current || map.current) return;
 
-    // Initialize map
-    map.current = new maplibregl.Map({
-      container: mapContainer.current,
-      style: 'https://tiles.openfreemap.org/styles/liberty',
-      center: [lng, lat],
-      zoom: 16,
-    });
+    // Wait for dialog animation to complete
+    const timer = setTimeout(() => {
+      if (!mapContainer.current) return;
 
-    // Add navigation controls
-    map.current.addControl(
-      new maplibregl.NavigationControl({
-        visualizePitch: false,
-      }),
-      'top-right'
-    );
+      try {
+        // Initialize map
+        map.current = new maplibregl.Map({
+          container: mapContainer.current,
+          style: 'https://tiles.openfreemap.org/styles/liberty',
+          center: [lng, lat],
+          zoom: 16,
+        });
 
-    // Create marker
-    marker.current = new maplibregl.Marker({
-      color: '#5D866C',
-    })
-      .setLngLat([lng, lat])
-      .addTo(map.current);
+        // Add navigation controls
+        map.current.addControl(
+          new maplibregl.NavigationControl({
+            visualizePitch: false,
+          }),
+          'top-right'
+        );
 
-    return () => {
-      marker.current?.remove();
-      map.current?.remove();
-      map.current = null;
-    };
-  }, []);
+        // Create marker
+        marker.current = new maplibregl.Marker({
+          color: '#5D866C',
+        })
+          .setLngLat([lng, lat])
+          .addTo(map.current);
 
-  // Update map position when coordinates change or when sheet opens
+      } catch (error) {
+        console.error('Error initializing map:', error);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [open, lng, lat]);
+
+  // Cleanup when dialog closes
   useEffect(() => {
-    if (!map.current || !marker.current) return;
-
-    // Resize map when sheet opens to ensure proper dimensions
-    if (open) {
-      setTimeout(() => {
-        map.current?.resize();
-        map.current?.setCenter([lng, lat]);
-        marker.current?.setLngLat([lng, lat]);
-      }, 350);
+    if (!open && map.current) {
+      if (marker.current) {
+        marker.current.remove();
+        marker.current = null;
+      }
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     }
+  }, [open]);
+
+  // Update map position when coordinates change (after map is initialized)
+  useEffect(() => {
+    if (!map.current || !marker.current || !open) return;
+
+    map.current.setCenter([lng, lat]);
+    marker.current.setLngLat([lng, lat]);
   }, [lat, lng, open]);
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-2xl">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
             View the location on the map
-          </SheetDescription>
-        </SheetHeader>
-        <div className="space-y-3 mt-4">
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
           {address && (
             <div className="flex items-start gap-2 text-sm">
               <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
@@ -100,12 +114,12 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
               </div>
             </div>
           )}
-          <div className="w-full h-[calc(100vh-200px)] rounded-lg border overflow-hidden">
+          <div className="w-full h-[400px] rounded-lg border overflow-hidden">
             <div ref={mapContainer} className="w-full h-full" />
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 };
 
