@@ -3,11 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, FileText, Pencil, Trash2, MapPin, ExternalLink } from "lucide-react";
+import { Search, FileText, Pencil, Trash2, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AddResidentDialog from "@/components/AddResidentDialog";
 import EditResidentDialog from "@/components/EditResidentDialog";
+import LocationDialog from "@/components/map/LocationDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,12 +35,21 @@ interface Resident {
   is_indigenous: boolean;
 }
 
+interface HouseholdLocation {
+  latitude: number;
+  longitude: number;
+  house_number: string;
+  purok: string | null;
+  street_address: string | null;
+}
+
 export default function Residents() {
   const [residents, setResidents] = useState<Resident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingResident, setEditingResident] = useState<Resident | null>(null);
   const [deletingResident, setDeletingResident] = useState<Resident | null>(null);
+  const [viewingLocation, setViewingLocation] = useState<HouseholdLocation | null>(null);
   const { toast } = useToast();
 
   const fetchResidents = async () => {
@@ -105,7 +115,7 @@ export default function Residents() {
     try {
       const { data, error } = await supabase
         .from("households")
-        .select("id, house_number, purok, street_address, latitude, longitude")
+        .select("house_number, purok, street_address, latitude, longitude")
         .eq("id", resident.household_id)
         .single();
 
@@ -120,13 +130,7 @@ export default function Residents() {
         return;
       }
 
-      // Open Google Maps in a new tab
-      const googleMapsUrl = `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=17&t=m`;
-      window.open(googleMapsUrl, '_blank');
-      toast({
-        title: "Opening location",
-        description: `House ${data.house_number}`,
-      });
+      setViewingLocation(data);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -246,10 +250,9 @@ export default function Residents() {
                             size="sm"
                             onClick={() => handleViewLocation(resident)}
                             disabled={!resident.household_id}
-                            title={resident.household_id ? "Open household location in Google Maps" : "No household assigned"}
+                            title={resident.household_id ? "View household location" : "No household assigned"}
                           >
                             <MapPin className="h-4 w-4" />
-                            <ExternalLink className="h-3 w-3 ml-1" />
                           </Button>
                         </td>
                         <td className="py-4 text-right">
@@ -286,6 +289,17 @@ export default function Residents() {
           open={!!editingResident}
           onOpenChange={(open) => !open && setEditingResident(null)}
           onSuccess={fetchResidents}
+        />
+      )}
+
+      {viewingLocation && (
+        <LocationDialog
+          open={!!viewingLocation}
+          onOpenChange={(open) => !open && setViewingLocation(null)}
+          lat={viewingLocation.latitude}
+          lng={viewingLocation.longitude}
+          title="Household Location"
+          address={`House ${viewingLocation.house_number}${viewingLocation.purok ? `, ${viewingLocation.purok}` : ''}${viewingLocation.street_address ? `, ${viewingLocation.street_address}` : ''}`}
         />
       )}
 

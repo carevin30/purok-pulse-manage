@@ -2,12 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { MapPin } from 'lucide-react';
 
 interface LocationDialogProps {
@@ -31,29 +31,38 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
   const map = useRef<maplibregl.Map | null>(null);
   const marker = useRef<maplibregl.Marker | null>(null);
 
-  // Initialize map ONLY when dialog is open
   useEffect(() => {
-    if (!open || !mapContainer.current) return;
+    if (!open) return;
 
-    // Wait for dialog animation to complete
+    // Delay to ensure sheet is fully rendered
     const initTimer = setTimeout(() => {
       if (!mapContainer.current || map.current) return;
 
       try {
-        // Initialize map
+        // Initialize map with OpenStreetMap tiles
         map.current = new maplibregl.Map({
           container: mapContainer.current,
-          style: 'https://tiles.openfreemap.org/styles/liberty',
+          style: {
+            version: 8,
+            sources: {
+              osm: {
+                type: 'raster',
+                tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                tileSize: 256,
+                attribution: '&copy; OpenStreetMap Contributors',
+                maxzoom: 19
+              }
+            },
+            layers: [
+              {
+                id: 'osm',
+                type: 'raster',
+                source: 'osm'
+              }
+            ]
+          },
           center: [lng, lat],
           zoom: 16,
-        });
-
-        // Resize map once it's loaded to ensure proper rendering
-        map.current.on('load', () => {
-          if (map.current) {
-            map.current.resize();
-            map.current.setCenter([lng, lat]);
-          }
         });
 
         // Add navigation controls
@@ -64,19 +73,25 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
           'top-right'
         );
 
-        // Create marker
-        marker.current = new maplibregl.Marker({
-          color: '#5D866C',
-        })
-          .setLngLat([lng, lat])
-          .addTo(map.current);
+        // Resize map when loaded and add marker
+        map.current.on('load', () => {
+          if (map.current) {
+            map.current.resize();
+            
+            // Create marker after map is loaded
+            marker.current = new maplibregl.Marker({
+              color: '#5D866C',
+            })
+              .setLngLat([lng, lat])
+              .addTo(map.current);
+          }
+        });
 
       } catch (error) {
         console.error('Error initializing map:', error);
       }
-    }, 300);
+    }, 400);
 
-    // Cleanup when dialog closes
     return () => {
       clearTimeout(initTimer);
       if (marker.current) {
@@ -91,15 +106,15 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
   }, [open, lat, lng]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            View the location on the map
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-3">
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="w-full sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>
+            View the location on OpenStreetMap
+          </SheetDescription>
+        </SheetHeader>
+        <div className="space-y-3 mt-4">
           {address && (
             <div className="flex items-start gap-2 text-sm">
               <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
@@ -111,12 +126,12 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
               </div>
             </div>
           )}
-          <div className="w-full h-[400px] rounded-lg border overflow-hidden">
+          <div className="w-full h-[500px] rounded-lg border overflow-hidden">
             <div ref={mapContainer} className="w-full h-full" />
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 
