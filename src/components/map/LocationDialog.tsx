@@ -2,12 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { MapPin } from 'lucide-react';
 
 interface LocationDialogProps {
@@ -94,15 +94,15 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
   }, [lat, lng, open]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="w-full sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>
             View the location on the map
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-3">
+          </SheetDescription>
+        </SheetHeader>
+        <div className="space-y-3 mt-4">
           {address && (
             <div className="flex items-start gap-2 text-sm">
               <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
@@ -114,12 +114,12 @@ const LocationDialog: React.FC<LocationDialogProps> = ({
               </div>
             </div>
           )}
-          <div className="w-full h-[400px] rounded-lg border overflow-hidden">
+          <div className="w-full h-[calc(100vh-200px)] rounded-lg border overflow-hidden">
             <div ref={mapContainer} className="w-full h-full" />
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 
