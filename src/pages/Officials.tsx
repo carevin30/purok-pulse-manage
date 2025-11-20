@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AddOfficialDialog from "@/components/AddOfficialDialog";
 import EditOfficialDialog from "@/components/EditOfficialDialog";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +35,7 @@ interface Official {
   term_start: string;
   term_end: string | null;
   status: string;
+  photo_url: string | null;
   residents: {
     first_name: string;
     middle_name: string | null;
@@ -168,6 +170,7 @@ export default function Officials() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Photo</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Position</TableHead>
                     <TableHead>Term Start</TableHead>
@@ -179,6 +182,14 @@ export default function Officials() {
                 <TableBody>
                   {filteredOfficials.map((official) => (
                     <TableRow key={official.id}>
+                      <TableCell>
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={official.photo_url || undefined} alt={`${official.residents.first_name} ${official.residents.last_name}`} />
+                          <AvatarFallback>
+                            {official.residents.first_name[0]}{official.residents.last_name[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                      </TableCell>
                       <TableCell className="font-medium">
                         {official.residents.first_name}{" "}
                         {official.residents.middle_name
