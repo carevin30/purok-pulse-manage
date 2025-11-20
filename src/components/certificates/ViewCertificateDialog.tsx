@@ -110,8 +110,8 @@ export default function ViewCertificateDialog({
 
   const renderResidencyContent = () => {
     const residentAddress = certificate.residents?.house_number 
-      ? `${certificate.residents.house_number}, Poblacion, Lagangilang, Abra 2802`
-      : "Poblacion, Lagangilang, Abra 2802";
+      ? `${certificate.residents.house_number}, Barangay Sarayan, Matalam, Cotabato`
+      : "Barangay Sarayan, Matalam, Cotabato";
     
     return (
       <>
@@ -321,7 +321,7 @@ export default function ViewCertificateDialog({
             {/* Body Content Based on Type */}
             <div className="space-y-4">
               {certificate.certificate_type === 'certificate_of_indigency' && renderIndigencyContent()}
-              {certificate.certificate_type === 'certificate_of_residency' && renderResidencyContent()}
+              {(certificate.certificate_type === 'certificate_of_residency' || certificate.certificate_type === 'residency') && renderResidencyContent()}
               {certificate.certificate_type === 'business_permit' && renderBusinessPermitContent()}
             </div>
 
