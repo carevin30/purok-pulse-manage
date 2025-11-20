@@ -174,6 +174,9 @@ export default function GenerateCertificateDialog({
                       <SelectItem value="barangay_clearance">
                         Barangay Clearance
                       </SelectItem>
+                      <SelectItem value="mayors_permit">
+                        Mayor's Permit
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
