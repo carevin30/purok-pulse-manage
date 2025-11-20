@@ -59,7 +59,7 @@ export default function ViewCertificateDialog({
             ? `${certificate.residents.first_name.toUpperCase()} ${certificate.residents.last_name.toUpperCase()}`
             : "N/A"}
         </span>
-        , 29 years old, single, a bona fide resident of Purok 7, Barangay Sarayan, Matalam, Cotabato.
+        , 29 years old, single, a bona fide resident of Poblacion, Lagangilang, Abra.
       </p>
 
       <p className="text-justify leading-relaxed">
