@@ -220,6 +220,60 @@ export default function ViewCertificateDialog({
     </div>
   );
 
+  const renderMayorsPermitContent = () => (
+    <div className="space-y-6">
+      <p className="text-justify leading-relaxed indent-12">
+        Permit is hereby granted to{" "}
+        <span className="font-bold">
+          {certificate.residents
+            ? `${certificate.residents.first_name} ${certificate.residents.last_name}`
+            : "_______________"}
+        </span>{" "}
+        to operate as non-profit association providing farm machineries to farmers in which they can rent to a minimal amount for its maintenance.
+      </p>
+
+      <p className="text-justify leading-relaxed indent-12">
+        This certifies that mayor's permit has been granted to operate subject to the existing laws, ordinances, rules, and regulations of Lagangilang, Abra pursuant to the provisions of Revenue Code of 2019 and provides further any violation therefore will be sufficient grounds for the revocation of the permit.
+      </p>
+
+      <p className="leading-relaxed indent-12 mb-24">
+        Issued this{" "}
+        <u className="font-semibold px-4">
+          {format(new Date(certificate.issued_date), "do")}
+        </u>{" "}
+        day of{" "}
+        <u className="font-semibold px-4">
+          {format(new Date(certificate.issued_date), "MMMM")}
+        </u>
+        , {format(new Date(certificate.issued_date), "yyyy")} at Lagangilang, Abra, Philippines.
+      </p>
+
+      <div className="flex justify-end">
+        <div className="text-center">
+          <p className="font-bold text-base">
+            {certificate.issued_by || "ROVELYNE VILLAMOR"}
+          </p>
+          <p className="text-sm italic">Municipal Mayor</p>
+        </div>
+      </div>
+
+      <div className="mt-12 grid grid-cols-3 gap-4 text-xs border-t pt-4">
+        <div>
+          <p className="font-semibold">PERMIT FEE:</p>
+          <p>Php 500.00</p>
+        </div>
+        <div>
+          <p className="font-semibold">OFFICIAL RECEIPT #:</p>
+          <p>{certificate.certificate_number}</p>
+        </div>
+        <div>
+          <p className="font-semibold">DATE OF ISSUANCE:</p>
+          <p>{format(new Date(certificate.issued_date), "MM-dd-yy")}</p>
+        </div>
+      </div>
+    </div>
+  );
+
   const handleDownloadPDF = async () => {
     if (!certificateRef.current) return;
 
@@ -278,7 +332,28 @@ export default function ViewCertificateDialog({
 
         <div ref={certificateRef} className="border-2 border-foreground rounded-lg p-8 bg-white">
           {/* Header with Logo */}
-          {certificate.certificate_type === 'business_permit' ? (
+          {certificate.certificate_type === 'mayors_permit' ? (
+            <div className="text-center mb-6">
+              <div className="flex items-center justify-center gap-8 mb-4">
+                <img 
+                  src={barangayLogo} 
+                  alt="Municipality Logo" 
+                  className="w-20 h-20 object-contain"
+                />
+                <div className="flex-1">
+                  <p className="text-sm">Republic of the Philippines</p>
+                  <p className="text-sm">Cordillera Administrative Region</p>
+                  <p className="text-sm">Province of Abra</p>
+                  <p className="text-base font-bold">MUNICIPALITY OF LAGANGILANG</p>
+                </div>
+                <img 
+                  src={barangayLogo} 
+                  alt="Mayor Photo" 
+                  className="w-20 h-20 object-contain rounded-full"
+                />
+              </div>
+            </div>
+          ) : certificate.certificate_type === 'business_permit' ? (
             <div className="text-center mb-6">
               <img 
                 src={barangayLogo} 
@@ -310,9 +385,11 @@ export default function ViewCertificateDialog({
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold uppercase" style={{ color: certificate.certificate_type === 'business_permit' ? '#000' : '#16a34a' }}>
+            <h3 className="text-2xl font-bold uppercase" style={{ color: certificate.certificate_type === 'business_permit' || certificate.certificate_type === 'mayors_permit' ? '#000' : '#16a34a' }}>
               {certificate.certificate_type === 'business_permit' 
-                ? 'BARANGAY BUSINESS CLEARANCE' 
+                ? 'BARANGAY BUSINESS CLEARANCE'
+                : certificate.certificate_type === 'mayors_permit'
+                ? "MAYOR'S PERMIT"
                 : getCertificateTypeLabel(certificate.certificate_type)}
             </h3>
           </div>
@@ -323,6 +400,7 @@ export default function ViewCertificateDialog({
               {certificate.certificate_type === 'certificate_of_indigency' && renderIndigencyContent()}
               {(certificate.certificate_type === 'certificate_of_residency' || certificate.certificate_type === 'residency') && renderResidencyContent()}
               {certificate.certificate_type === 'business_permit' && renderBusinessPermitContent()}
+              {certificate.certificate_type === 'mayors_permit' && renderMayorsPermitContent()}
             </div>
 
             {/* Certificate Number */}
