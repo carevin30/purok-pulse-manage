@@ -225,9 +225,7 @@ export default function ViewCertificateDialog({
       <p className="text-justify leading-relaxed indent-12">
         Permit is hereby granted to{" "}
         <span className="font-bold">
-          {certificate.residents
-            ? `${certificate.residents.first_name} ${certificate.residents.last_name}`
-            : "_______________"}
+          {certificate.purpose || "_______________"}
         </span>{" "}
         to operate as non-profit association providing farm machineries to farmers in which they can rent to a minimal amount for its maintenance.
       </p>
@@ -257,18 +255,28 @@ export default function ViewCertificateDialog({
         </div>
       </div>
 
-      <div className="mt-12 grid grid-cols-3 gap-4 text-xs border-t pt-4">
-        <div>
-          <p className="font-semibold">PERMIT FEE:</p>
-          <p>Php 500.00</p>
+      <div className="mt-12 border-t pt-4">
+        <div className="mb-4">
+          <p className="text-sm">Requested by:</p>
+          <p className="font-bold">
+            {certificate.residents
+              ? `${certificate.residents.first_name} ${certificate.residents.last_name}`
+              : "N/A"}
+          </p>
         </div>
-        <div>
-          <p className="font-semibold">OFFICIAL RECEIPT #:</p>
-          <p>{certificate.certificate_number}</p>
-        </div>
-        <div>
-          <p className="font-semibold">DATE OF ISSUANCE:</p>
-          <p>{format(new Date(certificate.issued_date), "MM-dd-yy")}</p>
+        <div className="grid grid-cols-3 gap-4 text-xs">
+          <div>
+            <p className="font-semibold">PERMIT FEE:</p>
+            <p>Php 500.00</p>
+          </div>
+          <div>
+            <p className="font-semibold">OFFICIAL RECEIPT #:</p>
+            <p>{certificate.certificate_number}</p>
+          </div>
+          <div>
+            <p className="font-semibold">DATE OF ISSUANCE:</p>
+            <p>{format(new Date(certificate.issued_date), "MM-dd-yy")}</p>
+          </div>
         </div>
       </div>
     </div>
