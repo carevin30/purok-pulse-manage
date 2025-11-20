@@ -273,6 +273,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          photo_url: string | null
           position: string
           resident_id: string
           status: string
@@ -283,6 +284,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          photo_url?: string | null
           position: string
           resident_id: string
           status?: string
@@ -293,6 +295,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          photo_url?: string | null
           position?: string
           resident_id?: string
           status?: string
