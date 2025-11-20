@@ -81,7 +81,7 @@ export default function ViewCertificateDialog({
         <span className="font-semibold">
           {format(new Date(certificate.issued_date), "MMMM yyyy")}
         </span>{" "}
-        at Barangay Sarayan, Matalam, Cotabato.
+        at Poblacion, Lagangilang, Abra.
       </p>
 
       <div className="mt-8">
@@ -110,8 +110,8 @@ export default function ViewCertificateDialog({
 
   const renderResidencyContent = () => {
     const residentAddress = certificate.residents?.house_number 
-      ? `${certificate.residents.house_number}, Barangay Sarayan, Matalam, Cotabato`
-      : "Barangay Sarayan, Matalam, Cotabato";
+      ? `${certificate.residents.house_number}, Poblacion, Lagangilang, Abra`
+      : "Poblacion, Lagangilang, Abra";
     
     return (
       <>
