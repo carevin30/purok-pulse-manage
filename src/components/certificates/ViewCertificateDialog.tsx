@@ -383,9 +383,9 @@ export default function ViewCertificateDialog({
               />
               <div className="flex-1 text-center">
                 <p className="text-sm font-semibold">Republic of the Philippines</p>
-                <p className="text-sm font-semibold">Province of Cotabato</p>
-                <p className="text-sm font-semibold">Municipality of Matalam</p>
-                <p className="text-sm font-semibold">Barangay Sarayan</p>
+                <p className="text-sm font-semibold">Cordillera Administrative Region</p>
+                <p className="text-sm font-semibold">Province of Abra</p>
+                <p className="text-sm font-semibold">MUNICIPALITY OF LAGANGILANG</p>
                 <p className="text-xs font-bold mt-1">OFFICE OF THE PUNONG BARANGAY</p>
               </div>
             </div>
