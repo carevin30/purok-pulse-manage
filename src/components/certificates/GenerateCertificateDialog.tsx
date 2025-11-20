@@ -217,10 +217,18 @@ export default function GenerateCertificateDialog({
               name="purpose"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Purpose</FormLabel>
+                  <FormLabel>
+                    {form.watch("certificate_type") === "mayors_permit"
+                      ? "Business/Organization Name"
+                      : "Purpose"}
+                  </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Enter the purpose of the certificate"
+                      placeholder={
+                        form.watch("certificate_type") === "mayors_permit"
+                          ? "Enter business or organization name"
+                          : "Enter the purpose of the certificate"
+                      }
                       {...field}
                     />
                   </FormControl>
