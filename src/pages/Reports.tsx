@@ -112,6 +112,15 @@ export default function Reports() {
 
     const newStatus = statusCycle[currentStatus] || "Pending";
 
+    // Optimistic update
+    setReports(prevReports =>
+      prevReports.map(report =>
+        report.id === reportId
+          ? { ...report, status: newStatus }
+          : report
+      )
+    );
+
     try {
       const { error } = await supabase
         .from("reports")
@@ -125,6 +134,15 @@ export default function Reports() {
         description: `Status updated to ${newStatus}`,
       });
     } catch (error) {
+      // Revert on error
+      setReports(prevReports =>
+        prevReports.map(report =>
+          report.id === reportId
+            ? { ...report, status: currentStatus }
+            : report
+        )
+      );
+      
       toast({
         title: "Error",
         description: "Failed to update status",
