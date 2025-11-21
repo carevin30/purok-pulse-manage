@@ -102,14 +102,53 @@ export default function Reports() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const handleStatusClick = async (reportId: string, currentStatus: string) => {
+    const statusCycle: Record<string, string> = {
+      "Pending": "In Progress",
+      "In Progress": "Resolved",
+      "Resolved": "Closed",
+      "Closed": "Pending",
+    };
+
+    const newStatus = statusCycle[currentStatus] || "Pending";
+
+    try {
+      const { error } = await supabase
+        .from("reports")
+        .update({ status: newStatus })
+        .eq("id", reportId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Status updated to ${newStatus}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getStatusBadge = (status: string, reportId: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
       Pending: "outline",
       "In Progress": "secondary",
       Resolved: "default",
       Closed: "destructive",
     };
-    return <Badge variant={variants[status] || "default"}>{status}</Badge>;
+    return (
+      <Badge 
+        variant={variants[status] || "default"} 
+        className="cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => handleStatusClick(reportId, status)}
+      >
+        {status}
+      </Badge>
+    );
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -170,7 +209,7 @@ export default function Reports() {
                     <TableCell>{report.reported_by || "—"}</TableCell>
                     <TableCell>{report.location || "—"}</TableCell>
                     <TableCell>{getPriorityBadge(report.priority)}</TableCell>
-                    <TableCell>{getStatusBadge(report.status)}</TableCell>
+                    <TableCell>{getStatusBadge(report.status, report.id)}</TableCell>
                     <TableCell>
                       {new Date(report.reported_date).toLocaleDateString()}
                     </TableCell>
