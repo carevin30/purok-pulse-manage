@@ -77,9 +77,64 @@ export default function Certificates() {
         variant: "destructive",
       });
     } else {
-      setCertificates(data || []);
+      const updatedData = (data || []).map(cert => {
+        // Auto-expire certificates beyond valid_until date
+        if (cert.valid_until && new Date(cert.valid_until) < new Date() && cert.status === "Active") {
+          return { ...cert, status: "Expired" };
+        }
+        return cert;
+      });
+      setCertificates(updatedData);
     }
     setLoading(false);
+  };
+
+  const handleStatusClick = async (id: string, currentStatus: string) => {
+    const statusCycle: Record<string, string> = {
+      "Active": "Expired",
+      "Expired": "Revoked",
+      "Revoked": "Active",
+    };
+
+    const newStatus = statusCycle[currentStatus] || "Active";
+
+    // Optimistic update
+    setCertificates(prevCerts =>
+      prevCerts.map(cert =>
+        cert.id === id
+          ? { ...cert, status: newStatus }
+          : cert
+      )
+    );
+
+    try {
+      const { error } = await supabase
+        .from("certificates")
+        .update({ status: newStatus })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Status updated to ${newStatus}`,
+      });
+    } catch (error) {
+      // Revert on error
+      setCertificates(prevCerts =>
+        prevCerts.map(cert =>
+          cert.id === id
+            ? { ...cert, status: currentStatus }
+            : cert
+        )
+      );
+      
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredCertificates = certificates.filter((cert) => {
@@ -101,14 +156,18 @@ export default function Certificates() {
       .join(" ");
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, certId: string) => {
     const variants = {
       Active: "default",
       Expired: "secondary",
       Revoked: "destructive",
     } as const;
     return (
-      <Badge variant={variants[status as keyof typeof variants] || "outline"}>
+      <Badge 
+        variant={variants[status as keyof typeof variants] || "outline"}
+        className="cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => handleStatusClick(certId, status)}
+      >
         {status}
       </Badge>
     );
@@ -316,7 +375,7 @@ export default function Certificates() {
                       ? format(new Date(cert.valid_until), "MMM dd, yyyy")
                       : "No expiry"}
                   </TableCell>
-                  <TableCell>{getStatusBadge(cert.status)}</TableCell>
+                  <TableCell>{getStatusBadge(cert.status, cert.id)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <ViewCertificateDialog certificate={cert} />
