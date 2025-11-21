@@ -87,8 +87,12 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background p-4">
-      <Card className="w-full max-w-md">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: 'url(/images/church-background.jpg)' }}
+    >
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <Card className="w-full max-w-md relative z-10 bg-card/95 backdrop-blur-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Barangay Management System</CardTitle>
           <CardDescription>Sign in to manage barangay records</CardDescription>
