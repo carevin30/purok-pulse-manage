@@ -54,6 +54,37 @@ export default function Ordinances() {
     }
   };
 
+  const handleStatusClick = async (id: string, currentStatus: string) => {
+    const statusCycle: Record<string, string> = {
+      "Active": "Amended",
+      "Amended": "Repealed",
+      "Repealed": "Active",
+    };
+
+    const newStatus = statusCycle[currentStatus] || "Active";
+
+    try {
+      const { error } = await supabase
+        .from("ordinances")
+        .update({ status: newStatus })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Status updated to ${newStatus}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["ordinances"] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Active":
@@ -65,6 +96,18 @@ export default function Ordinances() {
       default:
         return "outline";
     }
+  };
+
+  const getStatusBadge = (status: string, ordinanceId: string) => {
+    return (
+      <Badge 
+        variant={getStatusColor(status)} 
+        className="cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => handleStatusClick(ordinanceId, status)}
+      >
+        {status}
+      </Badge>
+    );
   };
 
   return (
@@ -121,9 +164,7 @@ export default function Ordinances() {
                       {format(new Date(ordinance.date_enacted), "MMM dd, yyyy")}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getStatusColor(ordinance.status)}>
-                        {ordinance.status}
-                      </Badge>
+                      {getStatusBadge(ordinance.status, ordinance.id)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

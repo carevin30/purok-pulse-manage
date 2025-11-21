@@ -54,6 +54,38 @@ export default function Activities() {
     }
   };
 
+  const handleStatusClick = async (id: string, currentStatus: string) => {
+    const statusCycle: Record<string, string> = {
+      "Scheduled": "Ongoing",
+      "Ongoing": "Completed",
+      "Completed": "Cancelled",
+      "Cancelled": "Scheduled",
+    };
+
+    const newStatus = statusCycle[currentStatus] || "Scheduled";
+
+    try {
+      const { error } = await supabase
+        .from("activities")
+        .update({ status: newStatus })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Status updated to ${newStatus}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Scheduled":
@@ -67,6 +99,18 @@ export default function Activities() {
       default:
         return "outline";
     }
+  };
+
+  const getStatusBadge = (status: string, activityId: string) => {
+    return (
+      <Badge 
+        variant={getStatusColor(status)} 
+        className="cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => handleStatusClick(activityId, status)}
+      >
+        {status}
+      </Badge>
+    );
   };
 
   return (
@@ -147,9 +191,7 @@ export default function Activities() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getStatusColor(activity.status)}>
-                        {activity.status}
-                      </Badge>
+                      {getStatusBadge(activity.status, activity.id)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
