@@ -49,9 +49,10 @@ export default function Layout() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
+      if (!session && event !== 'INITIAL_SESSION') {
+        setUserEmail("");
+        navigate("/auth", { replace: true });
+      } else if (session) {
         setUserEmail(session.user.email || "");
       }
     });
@@ -60,15 +61,23 @@ export default function Layout() {
   }, [navigate]);
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+      // Navigation is handled by onAuthStateChange listener
+    } catch (error) {
+      console.error("Logout error:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to sign out",
         variant: "destructive",
       });
-    } else {
-      navigate("/auth");
     }
   };
 
