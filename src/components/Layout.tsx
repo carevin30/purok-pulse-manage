@@ -91,7 +91,7 @@ export default function Layout() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-foreground">BDHUB</h1>
-            <p className="text-xs text-muted-foreground">Management System</p>
+            <p className="text-xs text-muted-foreground">Barangay Data Hub</p>
           </div>
         </div>
         
